@@ -1,3 +1,4 @@
+import 'hardhat-deploy';
 import 'dotenv/config';
 import { task, types } from "hardhat/config";
 import { HardhatUserConfig } from "hardhat/types";
