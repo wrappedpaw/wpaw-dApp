@@ -2,7 +2,7 @@ import Vue from 'vue'
 import { ethers } from 'ethers'
 import numeral from 'numeral'
 import { date } from 'quasar'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 
 const bnToStringFilter = Vue.filter('bnToString', (value: string) => {
 	if (value === '') {
@@ -39,9 +39,9 @@ const blockchainAddressFilter = Vue.filter('blockchainAddress', (address: string
 		.concat(address.substring(address.length - 6))
 })
 
-const banPriceFilter = Vue.filter('banPrice', (_amount: string) => {
+const pawPriceFilter = Vue.filter('pawPrice', (_amount: string) => {
 	const amount = numeral(_amount).value() || 0
-	return numeral(amount * ban.banPriceInUSD).format('$0,0.00')
+	return numeral(amount * paw.pawPriceInUSD).format('$0,0.00')
 })
 
 const timestampFilter = Vue.filter('timestamp', (timestamp: string) => {
@@ -63,7 +63,7 @@ export {
 	bnToExactStringFilter,
 	bnToHumanStringFilter,
 	blockchainAddressFilter,
-	banPriceFilter,
+	pawPriceFilter,
 	timestampFilter,
 	hashTrimmedFilter,
 }

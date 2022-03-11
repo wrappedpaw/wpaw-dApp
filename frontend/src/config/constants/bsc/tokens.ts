@@ -1,15 +1,15 @@
 import { TokensList } from '../types'
 
 const tokens: TokensList = {
-	wban: {
-		symbol: 'wBAN',
+	wpaw: {
+		symbol: 'wPAW',
 		address: {
-			dev: '0xe20b9e246db5a0d21bf9209e4858bc9a3ff7a034',
+			dev: '0x47833fF31C106920fA6a8620444255dD5AcB4793',
 			staging: '0x9222D24274E912F4d5E889b460924C4fEFe97954',
-			production: '0xe20B9e246db5a0d21BF9209E4858Bc9A3ff7A034',
+			production: '0x47833fF31C106920fA6a8620444255dD5AcB4793',
 		},
 		decimals: 18,
-		projectLink: 'https://bsc.banano.cc/',
+		projectLink: 'https://bsc.paw.digital/',
 	},
 	bnb: {
 		symbol: 'BNB',

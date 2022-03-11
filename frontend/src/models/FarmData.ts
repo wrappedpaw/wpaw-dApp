@@ -7,7 +7,7 @@ interface PoolData {
 	address: Address
 	tvl: BigNumber
 	balanceToken0: BigNumber
-	balanceToken1?: BigNumber // empty when wBAN stakiing
+	balanceToken1?: BigNumber // empty when wPAW stakiing
 	priceToken0: number
 	priceToken1: number
 	addressToken0: string
@@ -29,7 +29,7 @@ export interface FarmData {
 	poolData: PoolData
 	userPoolData: UserPoolData // only for liquidity pools
 
-	userGlobalBalance?: BigNumber // for wBAN staking only
+	userGlobalBalance?: BigNumber // for wPAW staking only
 	userPendingRewards: BigNumber
 	timeLeft: string
 

@@ -15,15 +15,15 @@ contract Benis is Ownable {
     struct UserInfo {
         uint256 amount; // How many LP tokens the user has provided.
         uint256 rewardDebt; // Reward debt. See explanation below.
-        uint256 remainingWBANReward; // WBAN Tokens that weren't distributed for user per pool.
+        uint256 remainingWPAWReward; // WPAW Tokens that weren't distributed for user per pool.
         //
-        // We do some fancy math here. Basically, any point in time, the amount of WBAN
+        // We do some fancy math here. Basically, any point in time, the amount of WPAW
         // entitled to a user but is pending to be distributed is:
         //
-        //   pending reward = (user.amount * pool.accWBANPerShare) - user.rewardDebt
+        //   pending reward = (user.amount * pool.accWPAWPerShare) - user.rewardDebt
         //
         // Whenever a user deposits or withdraws Staked tokens to a pool. Here's what happens:
-        //   1. The pool's `accWBANPerShare` (and `lastRewardTime`) gets updated.
+        //   1. The pool's `accWPAWPerShare` (and `lastRewardTime`) gets updated.
         //   2. User receives the pending reward sent to his/her address.
         //   3. User's `amount` gets updated.
         //   4. User's `rewardDebt` gets updated.
@@ -32,14 +32,14 @@ contract Benis is Ownable {
     struct PoolInfo {
         IBEP20 stakingToken; // Contract address of staked token
         uint256 stakingTokenTotalAmount; //Total amount of deposited tokens
-        uint256 accWBANPerShare; // Accumulated wBAN per share, times 1e12. See below.
-        uint32 lastRewardTime; // Last timestamp number that wBAN distribution occurs.
-        uint16 allocPoint; // How many allocation points assigned to this pool. wBAN to distribute per second.
+        uint256 accWPAWPerShare; // Accumulated wPAW per share, times 1e12. See below.
+        uint32 lastRewardTime; // Last timestamp number that wPAW distribution occurs.
+        uint16 allocPoint; // How many allocation points assigned to this pool. wPAW to distribute per second.
     }
 
-    IBEP20 public immutable wban; // The wBAN TOKEN!!
+    IBEP20 public immutable wpaw; // The wPAW TOKEN!!
 
-    uint256 public wbanPerSecond; // wBAN tokens vested per second.
+    uint256 public wpawPerSecond; // wPAW tokens vested per second.
 
     PoolInfo[] public poolInfo; // Info of each pool.
 
@@ -47,7 +47,7 @@ contract Benis is Ownable {
 
     uint256 public totalAllocPoint = 0; // Total allocation points. Must be the sum of all allocation points in all pools.
 
-    uint32 public immutable startTime; // The timestamp when wBAN farming starts.
+    uint32 public immutable startTime; // The timestamp when wPAW farming starts.
 
     uint32 public endTime; // Time on which the reward calculation should end
 
@@ -56,13 +56,13 @@ contract Benis is Ownable {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
     constructor(
-        IBEP20 _wban,
-        uint256 _wbanPerSecond,
+        IBEP20 _wpaw,
+        uint256 _wpawPerSecond,
         uint32 _startTime
     ) public {
-        wban = _wban;
+        wpaw = _wpaw;
 
-        wbanPerSecond = _wbanPerSecond;
+        wpawPerSecond = _wpawPerSecond;
         startTime = _startTime;
         endTime = _startTime;
     }
@@ -71,15 +71,15 @@ contract Benis is Ownable {
         endTime += addSeconds;
     }
 
-    // Changes wBAN token reward per second. Use this function to moderate the `lockup amount`.
+    // Changes wPAW token reward per second. Use this function to moderate the `lockup amount`.
     // Essentially this function changes the amount of the reward which is entitled to the
     // user for his token staking by the time the `endTime` is passed.
     // Good practice to update pools without messing up the contract
-    function setWBANPerSecond(uint256 _wbanPerSecond, bool _withUpdate) external onlyOwner {
+    function setWPAWPerSecond(uint256 _wpawPerSecond, bool _withUpdate) external onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }
-        wbanPerSecond = _wbanPerSecond;
+        wpawPerSecond = _wpawPerSecond;
     }
 
     // How many pools are in the contract
@@ -107,12 +107,12 @@ contract Benis is Ownable {
                 stakingTokenTotalAmount: 0,
                 allocPoint: _allocPoint,
                 lastRewardTime: uint32(lastRewardTime),
-                accWBANPerShare: 0
+                accWPAWPerShare: 0
             })
         );
     }
 
-    // Update the given pool's wBAN allocation point. Can only be called by the owner.
+    // Update the given pool's wPAW allocation point. Can only be called by the owner.
     // Good practice to update pools without messing up the contract
     function set(
         uint256 _pid,
@@ -138,18 +138,18 @@ contract Benis is Ownable {
         return _to - _from;
     }
 
-    // View function to see pending wBAN on frontend.
-    function pendingWBAN(uint256 _pid, address _user) external view returns (uint256) {
+    // View function to see pending wPAW on frontend.
+    function pendingWPAW(uint256 _pid, address _user) external view returns (uint256) {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_user];
-        uint256 accWBANPerShare = pool.accWBANPerShare;
+        uint256 accWPAWPerShare = pool.accWPAWPerShare;
 
         if (block.timestamp > pool.lastRewardTime && pool.stakingTokenTotalAmount != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-            uint256 wbanReward = multiplier.mul(wbanPerSecond).mul(pool.allocPoint).div(totalAllocPoint);
-            accWBANPerShare = accWBANPerShare.add(wbanReward.mul(1e12).div(pool.stakingTokenTotalAmount));
+            uint256 wpawReward = multiplier.mul(wpawPerSecond).mul(pool.allocPoint).div(totalAllocPoint);
+            accWPAWPerShare = accWPAWPerShare.add(wpawReward.mul(1e12).div(pool.stakingTokenTotalAmount));
         }
-        return user.amount.mul(accWBANPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWBANReward);
+        return user.amount.mul(accWPAWPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWPAWReward);
     }
 
     // Update reward vairables for all pools. Be careful of gas spending!
@@ -172,25 +172,25 @@ contract Benis is Ownable {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-        uint256 wbanReward = multiplier.mul(wbanPerSecond).mul(pool.allocPoint).div(totalAllocPoint);
-        pool.accWBANPerShare = pool.accWBANPerShare.add(wbanReward.mul(1e12).div(pool.stakingTokenTotalAmount));
+        uint256 wpawReward = multiplier.mul(wpawPerSecond).mul(pool.allocPoint).div(totalAllocPoint);
+        pool.accWPAWPerShare = pool.accWPAWPerShare.add(wpawReward.mul(1e12).div(pool.stakingTokenTotalAmount));
         pool.lastRewardTime = uint32(block.timestamp);
     }
 
-    // Deposit staking tokens to Benis for wBAN rewards.
+    // Deposit staking tokens to Benis for wPAW rewards.
     function deposit(uint256 _pid, uint256 _amount) public {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         updatePool(_pid);
         if (user.amount > 0) {
             uint256 pending =
-                user.amount.mul(pool.accWBANPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWBANReward);
-            user.remainingWBANReward = safeRewardTransfer(msg.sender, pending);
+                user.amount.mul(pool.accWPAWPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWPAWReward);
+            user.remainingWPAWReward = safeRewardTransfer(msg.sender, pending);
         }
         pool.stakingToken.safeTransferFrom(address(msg.sender), address(this), _amount);
         user.amount = user.amount.add(_amount);
         pool.stakingTokenTotalAmount = pool.stakingTokenTotalAmount.add(_amount);
-        user.rewardDebt = user.amount.mul(pool.accWBANPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accWPAWPerShare).div(1e12);
         emit Deposit(msg.sender, _pid, _amount);
     }
 
@@ -201,11 +201,11 @@ contract Benis is Ownable {
         require(user.amount >= _amount, 'Benis: not enough LP');
         updatePool(_pid);
         uint256 pending =
-            user.amount.mul(pool.accWBANPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWBANReward);
-        user.remainingWBANReward = safeRewardTransfer(msg.sender, pending);
+            user.amount.mul(pool.accWPAWPerShare).div(1e12).sub(user.rewardDebt).add(user.remainingWPAWReward);
+        user.remainingWPAWReward = safeRewardTransfer(msg.sender, pending);
         user.amount = user.amount.sub(_amount);
         pool.stakingTokenTotalAmount = pool.stakingTokenTotalAmount.sub(_amount);
-        user.rewardDebt = user.amount.mul(pool.accWBANPerShare).div(1e12);
+        user.rewardDebt = user.amount.mul(pool.accWPAWPerShare).div(1e12);
         pool.stakingToken.safeTransfer(address(msg.sender), _amount);
         emit Withdraw(msg.sender, _pid, _amount);
     }
@@ -221,20 +221,20 @@ contract Benis is Ownable {
         emit EmergencyWithdraw(msg.sender, _pid, userAmount);
     }
 
-    // Safe wBAN transfer function. Just in case if the pool does not have enough wBAN token,
+    // Safe wPAW transfer function. Just in case if the pool does not have enough wPAW token,
     // The function returns the amount which is owed to the user
     function safeRewardTransfer(address _to, uint256 _amount) internal returns (uint256) {
-        uint256 wbanBalance = wban.balanceOf(address(this));
-        if (wbanBalance == 0) {
+        uint256 wpawBalance = wpaw.balanceOf(address(this));
+        if (wpawBalance == 0) {
             //save some gas fee
             return _amount;
         }
-        if (_amount > wbanBalance) {
+        if (_amount > wpawBalance) {
             //save some gas fee
-            wban.safeTransfer(_to, wbanBalance);
-            return _amount.sub(wbanBalance);
+            wpaw.safeTransfer(_to, wpawBalance);
+            return _amount.sub(wpawBalance);
         }
-        wban.safeTransfer(_to, _amount);
+        wpaw.safeTransfer(_to, _amount);
         return 0;
     }
 }

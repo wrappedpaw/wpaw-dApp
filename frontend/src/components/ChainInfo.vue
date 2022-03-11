@@ -2,29 +2,29 @@
 	<div>
 		<div class="row q-col-gutter-md justify-center buttons text-center gt-xs">
 			<div class="col-3 flex">
-				<q-btn @click="depositBAN" color="primary" class="fit" stack>
-					<q-icon name="img:ban-deposit.svg" size="3em" />
-					<div class="text-button">Deposit BAN</div>
-					<q-tooltip content-class="bg-positive">Deposit some BAN for swaps</q-tooltip>
+				<q-btn @click="depositPAW" color="primary" class="fit" stack>
+					<q-icon name="img:paw-deposit.svg" size="3em" />
+					<div class="text-button">Deposit PAW</div>
+					<q-tooltip content-class="bg-positive">Deposit some PAW for swaps</q-tooltip>
 				</q-btn>
 			</div>
 			<div class="col-3 flex">
 				<q-btn @click="askWithdrawalAmount" :disable="withdrawalDisabled" color="primary" class="fit" stack>
-					<q-icon name="img:ban-withdraw.svg" size="3em" />
-					<div class="text-button">Withdraw BAN</div>
-					<q-tooltip content-class="bg-positive">Withdraw BAN back to your wallet</q-tooltip>
+					<q-icon name="img:paw-withdraw.svg" size="3em" />
+					<div class="text-button">Withdraw PAW</div>
+					<q-tooltip content-class="bg-positive">Withdraw PAW back to your wallet</q-tooltip>
 				</q-btn>
 			</div>
 			<div class="col-3 flex">
 				<q-btn @click="swap" color="primary" class="fit" stack>
-					<q-icon name="img:wban-swap.svg" size="3em" style="width: 100px" />
+					<q-icon name="img:wpaw-swap.svg" size="3em" style="width: 100px" />
 					<div class="text-button">Swap</div>
 					<q-tooltip content-class="bg-positive">Swap</q-tooltip>
 				</q-btn>
 			</div>
 			<div class="col-3 flex">
 				<q-btn to="/farms" color="primary" class="fit" stack>
-					<q-icon name="img:wban-farming.svg" size="3em" />
+					<q-icon name="img:wpaw-farming.svg" size="3em" />
 					<div class="text-button">Stake &amp; Farm</div>
 					<q-tooltip content-class="bg-positive">Liquidity Pools Farms</q-tooltip>
 				</q-btn>
@@ -33,47 +33,47 @@
 		<div class="warnings row justify-center" v-if="warningCode !== ''">
 			<div class="col-md-8 col-xs-12">
 				<q-banner inline-actions rounded class="bg-primary text-secondary">
-					<span v-if="warningCode == 'out-of-ban-and-wban'">You need to deposit more BAN!</span>
+					<span v-if="warningCode == 'out-of-paw-and-wpaw'">You need to deposit more PAW!</span>
 					<template v-slot:action>
-						<q-btn flat label="Deposit BAN" @click="depositBAN" v-if="warningCode == 'out-of-ban-and-wban'" />
+						<q-btn flat label="Deposit PAW" @click="depositPAW" v-if="warningCode == 'out-of-paw-and-wpaw'" />
 					</template>
 				</q-banner>
 			</div>
 		</div>
 		<div class="row justify-center">
 			<div class="col-md-7 col-sm-9 col-xs-12">
-				<swap-input v-if="!isOwner" :banBalance="banBalance" :wBanBalance="wBanBalance" />
+				<swap-input v-if="!isOwner" :pawBalance="pawBalance" :wPawBalance="wPawBalance" />
 			</div>
 		</div>
-		<q-dialog v-model="promptForBanDeposit" persistent>
-			<q-card class="ban-deposits-dialog">
+		<q-dialog v-model="promptForPawDeposit" persistent>
+			<q-card class="paw-deposits-dialog">
 				<q-card-section>
-					<div class="text-h6">BAN Deposits</div>
+					<div class="text-h6">PAW Deposits</div>
 				</q-card-section>
 				<q-card-section class="q-gutter-sm">
 					<div class="row">
 						<div class="col-md-9 col-xs-12">
 							<p>
-								If you want to swap more BAN, simply send some BAN from your
-								<span class="banano-address gt-sm">{{ banAddress }}</span> wallet to this wallet:
-								<strong class="banano-address gt-sm">{{ banWalletForDeposits }}</strong>
-								<a class="lt-md banano-address" :href="banWalletForDepositsLink">{{ banWalletForDeposits }}</a>
+								If you want to swap more PAW, simply send some PAW from your
+								<span class="paw-address gt-sm">{{ pawAddress }}</span> wallet to this wallet:
+								<strong class="paw-address gt-sm">{{ pawWalletForDeposits }}</strong>
+								<a class="lt-md paw-address" :href="pawWalletForDepositsLink">{{ pawWalletForDeposits }}</a>
 							</p>
 							<p>
 								Don't send amounts with more than 2 decimals and make sure there is no raw.<br />
 								Using "Max" link in Kalium is probably not going to work well.<br />
-								If you don't follow the previous rule, your BAN will be sent back to the wallet you sent them from.
-								<b>Make sure you don't withdraw from a CEX straight to this address or you may loose your BAN!</b>
+								If you don't follow the previous rule, your PAW will be sent back to the wallet you sent them from.
+								<b>Make sure you don't withdraw from a CEX straight to this address or you may loose your PAW!</b>
 							</p>
 						</div>
 						<div class="gt-sm col-md-3 text-right">
-							<q-icon :name="banWalletForDepositsQRCode" size="200px" />
+							<q-icon :name="pawWalletForDepositsQRCode" size="200px" />
 						</div>
 					</div>
 				</q-card-section>
 				<q-card-actions align="right">
 					<q-btn
-						@click="copyBanAddressForDepositsToClipboard"
+						@click="copyPawAddressForDepositsToClipboard"
 						v-if="!$q.platform.is.mobile"
 						color="primary"
 						text-color="secondary"
@@ -83,19 +83,19 @@
 				</q-card-actions>
 			</q-card>
 		</q-dialog>
-		<q-dialog v-model="promptForBanWithdrawal" persistent>
-			<q-card class="ban-withdrawal-dialog">
-				<form @submit.prevent.stop="withdrawBAN">
+		<q-dialog v-model="promptForPawWithdrawal" persistent>
+			<q-card class="paw-withdrawal-dialog">
+				<form @submit.prevent.stop="withdrawPAW">
 					<q-card-section>
-						<div class="text-h6">BAN Withdrawals</div>
+						<div class="text-h6">PAW Withdrawals</div>
 					</q-card-section>
 					<q-card-section class="q-gutter-sm">
 						<swap-currency-input
 							ref="currency-input"
 							label=""
 							:amount.sync="withdrawAmount"
-							:balance="banBalance"
-							currency="BAN"
+							:balance="pawBalance"
+							currency="PAW"
 							editable
 						/>
 					</q-card-section>
@@ -115,12 +115,12 @@ import { namespace } from 'vuex-class'
 import SwapInput from '@/components/SwapInput.vue'
 import SwapCurrencyInput from '@/components/SwapCurrencyInput.vue'
 import { bnToStringFilter } from '@/utils/filters'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 import accounts from '@/store/modules/accounts'
 import contracts from '@/store/modules/contracts'
 import backend from '@/store/modules/backend'
 import { WithdrawRequest } from '@/models/WithdrawRequest'
-import { WBANToken } from '../../../artifacts/typechain/WBANToken'
+import { WPAWToken } from '../../../artifacts/typechain/WPAWToken'
 import { BigNumber } from 'ethers'
 import { getAddress } from '@ethersproject/address'
 import QRCode from 'qrcode'
@@ -140,31 +140,31 @@ const contractsStore = namespace('contracts')
 	},
 })
 export default class ChainInfo extends Vue {
-	public banAddress = ''
+	public pawAddress = ''
 	public withdrawAmount = ''
-	public promptForBanDeposit = false
-	public promptForBanWithdrawal = false
-	public banWalletForDepositsQRCode = ''
+	public promptForPawDeposit = false
+	public promptForPawWithdrawal = false
+	public pawWalletForDepositsQRCode = ''
 
 	@Ref('currency-input') readonly currencyInput!: SwapCurrencyInput
 
 	@accountsStore.Getter('isUserConnected')
 	isUserConnected!: boolean
 
-	@backendStore.Getter('banDeposited')
-	banBalance!: BigNumber
+	@backendStore.Getter('pawDeposited')
+	pawBalance!: BigNumber
 
-	@backendStore.Getter('banWalletForDeposits')
-	banWalletForDeposits!: string
+	@backendStore.Getter('pawWalletForDeposits')
+	pawWalletForDeposits!: string
 
-	@backendStore.Getter('banWalletForDepositsLink')
-	banWalletForDepositsLink!: string
+	@backendStore.Getter('pawWalletForDepositsLink')
+	pawWalletForDepositsLink!: string
 
-	@contractsStore.Getter('wBanBalance')
-	wBanBalance!: BigNumber
+	@contractsStore.Getter('wPawBalance')
+	wPawBalance!: BigNumber
 
-	@contractsStore.Getter('wbanAddress')
-	wbanAddress!: string
+	@contractsStore.Getter('wpawAddress')
+	wpawAddress!: string
 
 	static DEX_URL: string = process.env.VUE_APP_DEX_URL || ''
 
@@ -177,39 +177,39 @@ export default class ChainInfo extends Vue {
 	}
 
 	get warningCode() {
-		if (this.banBalance.eq(BigNumber.from(0)) && this.wBanBalance.eq(BigNumber.from(0))) {
-			return 'out-of-ban-and-wban'
+		if (this.pawBalance.eq(BigNumber.from(0)) && this.wPawBalance.eq(BigNumber.from(0))) {
+			return 'out-of-paw-and-wpaw'
 		} else {
 			return ''
 		}
 	}
 
 	get withdrawalDisabled() {
-		return !this.banBalance.gt(BigNumber.from(0))
+		return !this.pawBalance.gt(BigNumber.from(0))
 	}
 
-	async depositBAN() {
-		this.promptForBanDeposit = true
+	async depositPAW() {
+		this.promptForPawDeposit = true
 	}
 
 	async askWithdrawalAmount() {
-		this.promptForBanWithdrawal = true
+		this.promptForPawWithdrawal = true
 	}
 
-	async withdrawBAN() {
+	async withdrawPAW() {
 		if (accounts.activeAccount) {
 			try {
 				if (!this.currencyInput.validate()) {
 					return
 				}
-				await backend.withdrawBAN({
+				await backend.withdrawPAW({
 					amount: Number.parseFloat(this.withdrawAmount),
-					// amount: Number.parseInt(ethers.utils.formatEther(this.banBalance)),
-					banAddress: ban.banAddress,
+					// amount: Number.parseInt(ethers.utils.formatEther(this.pawBalance)),
+					pawAddress: paw.pawAddress,
 					blockchainAddress: accounts.activeAccount,
 					provider: accounts.providerEthers,
 				} as WithdrawRequest)
-				this.promptForBanWithdrawal = false
+				this.promptForPawWithdrawal = false
 				this.withdrawAmount = ''
 				this.$emit('withdrawal')
 			} catch (err) {
@@ -222,9 +222,9 @@ export default class ChainInfo extends Vue {
 		this.$router.push('/swaps')
 		/*
 		if (ChainInfo.DEX_URL === 'https://app.sushi.com' || ChainInfo.DEX_URL === 'https://pancakeswap.finance') {
-			openURL(`${ChainInfo.DEX_URL}/swap?inputCurrency=${this.wbanAddress}`)
+			openURL(`${ChainInfo.DEX_URL}/swap?inputCurrency=${this.wpawAddress}`)
 		} else {
-			openURL(`${ChainInfo.DEX_URL}/#/swap?inputCurrency=${this.wbanAddress}`)
+			openURL(`${ChainInfo.DEX_URL}/#/swap?inputCurrency=${this.wpawAddress}`)
 		}
 		*/
 	}
@@ -233,12 +233,12 @@ export default class ChainInfo extends Vue {
 		console.debug('in reloadBalances')
 
 		// reload data from the backend
-		await backend.loadBanDeposited(this.banAddress)
+		await backend.loadPawDeposited(this.pawAddress)
 
 		// reload data from the smart-contract
 		const provider = accounts.providerEthers
 		await contracts.initContract(provider)
-		const contract: WBANToken | null = contracts.wbanContract
+		const contract: WPAWToken | null = contracts.wpawContract
 		if (contract && accounts.activeAccount) {
 			await contracts.loadBalances({ contract, account: accounts.activeAccount })
 		} else {
@@ -249,9 +249,9 @@ export default class ChainInfo extends Vue {
 		}
 	}
 
-	async copyBanAddressForDepositsToClipboard() {
+	async copyPawAddressForDepositsToClipboard() {
 		try {
-			await copyToClipboard(this.banWalletForDeposits)
+			await copyToClipboard(this.pawWalletForDeposits)
 			this.$q.notify({
 				type: 'positive',
 				message: 'Address copied',
@@ -266,24 +266,24 @@ export default class ChainInfo extends Vue {
 
 	async mounted() {
 		console.debug('in mounted')
-		await ban.init()
-		this.banAddress = ban.banAddress
-		await backend.initBackend(this.banAddress)
+		await paw.init()
+		this.pawAddress = paw.pawAddress
+		await backend.initBackend(this.pawAddress)
 		await this.reloadBalances()
 		try {
-			const qrcode: string = await QRCode.toDataURL(this.banWalletForDeposits, {
+			const qrcode: string = await QRCode.toDataURL(this.pawWalletForDeposits, {
 				scale: 6,
 				color: {
 					dark: '2A2A2E',
 					light: 'FBDD11',
 				},
 			})
-			this.banWalletForDepositsQRCode = `img:${qrcode}`
+			this.pawWalletForDepositsQRCode = `img:${qrcode}`
 		} catch (err) {
 			console.error(err)
 		}
-		document.addEventListener('deposit-ban', this.depositBAN)
-		document.addEventListener('withdraw-ban', this.askWithdrawalAmount)
+		document.addEventListener('deposit-paw', this.depositPAW)
+		document.addEventListener('withdraw-paw', this.askWithdrawalAmount)
 		document.addEventListener('reload-balances', this.reloadBalances)
 		document.addEventListener('swap', this.swap)
 	}
@@ -320,6 +320,6 @@ export default class ChainInfo extends Vue {
 	padding-top: 30px
 
 @media (min-width: 900px)
-	.ban-deposits-dialog
+	.paw-deposits-dialog
 		min-width: 900px
 </style>

@@ -145,7 +145,7 @@ class AccountsModule extends VuexModule {
 				darkMode: true,
 				hideBranding: true,
 				walletSelect: {
-					description: 'Please select a wallet to connect to wBAN bridge:',
+					description: 'Please select a wallet to connect to wPAW bridge:',
 					wallets,
 				},
 				walletCheck: [
@@ -238,8 +238,8 @@ class AccountsModule extends VuexModule {
 	}
 
 	@Action
-	async addWBANTokenToMetaMask() {
-		return MetaMask.addWBANToWallet()
+	async addWPAWTokenToMetaMask() {
+		return MetaMask.addWPAWToWallet()
 	}
 }
 

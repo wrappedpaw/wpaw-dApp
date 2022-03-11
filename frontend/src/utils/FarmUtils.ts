@@ -12,8 +12,8 @@ class FarmUtils {
 	private farmConfig!: FarmConfig
 	private envName = ''
 	private account = ''
-	private wbanAddress = ''
-	private banPriceInUSD = 0
+	private wpawAddress = ''
+	private pawPriceInUSD = 0
 	private prices: Map<string, number> = new Map()
 
 	static ENV_NAME: string = process.env.VUE_APP_ENV_NAME || ''
@@ -23,8 +23,8 @@ class FarmUtils {
 		farmConfig: FarmConfig,
 		envName: string,
 		account: string,
-		wbanAddress: string,
-		banPriceInUSD: number,
+		wpawAddress: string,
+		pawPriceInUSD: number,
 		prices: Map<string, number>,
 		signer: Signer,
 		benis: Benis
@@ -32,8 +32,8 @@ class FarmUtils {
 		this.farmConfig = farmConfig
 		this.envName = envName
 		this.account = account
-		this.wbanAddress = wbanAddress
-		this.banPriceInUSD = banPriceInUSD
+		this.wpawAddress = wpawAddress
+		this.pawPriceInUSD = pawPriceInUSD
 		this.prices = prices
 
 		const benisUtils = new BenisUtils()
@@ -50,9 +50,9 @@ class FarmUtils {
 		farmData = await this.computeAPR(farmData, envName, signer, benis)
 		if (this.isStaking()) {
 			farmData.userGlobalBalance = farmData.stakedBalance.add(farmData.userPendingRewards)
-			farmData.stakedValue = farmData.stakedBalance.mul(ethers.utils.parseEther(banPriceInUSD.toString())).div(BN_ONE)
+			farmData.stakedValue = farmData.stakedBalance.mul(ethers.utils.parseEther(pawPriceInUSD.toString())).div(BN_ONE)
 			farmData.totalValue = farmData.userGlobalBalance
-				.mul(ethers.utils.parseEther(banPriceInUSD.toString()))
+				.mul(ethers.utils.parseEther(pawPriceInUSD.toString()))
 				.div(BN_ONE)
 		} else {
 			farmData.userGlobalBalance = farmData.stakedBalance
@@ -64,14 +64,14 @@ class FarmUtils {
 				.div(BN_ONE)
 			farmData.stakedValue = userValueToken0.add(userValueToken1)
 			farmData.totalValue = farmData.stakedValue.add(
-				farmData.userPendingRewards.mul(ethers.utils.parseEther(banPriceInUSD.toString())).div(BN_ONE)
+				farmData.userPendingRewards.mul(ethers.utils.parseEther(pawPriceInUSD.toString())).div(BN_ONE)
 			)
 		}
 		return farmData
 	}
 
 	public isStaking(): boolean {
-		return this.wbanAddress === this.farmConfig.lpAddresses[this.envName as keyof Address]
+		return this.wpawAddress === this.farmConfig.lpAddresses[this.envName as keyof Address]
 	}
 
 	public static getFarms(): FarmConfig[] {
@@ -96,26 +96,26 @@ class FarmUtils {
 		const bep20 = new BEP20Utils()
 		const benisUtils = new BenisUtils()
 
-		const wbanPriceUsd = ethers.utils.parseEther(this.banPriceInUSD.toString())
+		const wpawPriceUsd = ethers.utils.parseEther(this.pawPriceInUSD.toString())
 
 		let poolLiquidityUsd = BN_ZERO
-		if (this.wbanAddress === farmData.poolData.address[this.envName as keyof Address]) {
-			farmData.poolData.symbol = 'wBAN'
-			farmData.poolData.priceToken0 = this.banPriceInUSD
-			farmData.poolData.priceToken1 = this.banPriceInUSD
+		if (this.wpawAddress === farmData.poolData.address[this.envName as keyof Address]) {
+			farmData.poolData.symbol = 'wPAW'
+			farmData.poolData.priceToken0 = this.pawPriceInUSD
+			farmData.poolData.priceToken1 = this.pawPriceInUSD
 			const userInfo = await benis.userInfo(farmData.pid, this.account)
 			farmData.stakedBalance = userInfo.amount
-			farmData.userPendingRewards = await benis.pendingWBAN(farmData.pid, this.account)
+			farmData.userPendingRewards = await benis.pendingWPAW(farmData.pid, this.account)
 			farmData.userPoolData = {
 				balance: farmData.stakedBalance,
 				balanceToken0: BigNumber.from(0),
 				balanceToken1: BN_ZERO,
 			}
 			const pool = await benis.poolInfo(farmData.pid)
-			const wbanLiquidity: BigNumber = pool.stakingTokenTotalAmount
-			farmData.poolData.balanceToken0 = wbanLiquidity
-			console.debug(`Benis is hodling ${ethers.utils.formatEther(wbanLiquidity)} wBAN`)
-			poolLiquidityUsd = wbanLiquidity.mul(wbanPriceUsd).div(BN_ONE)
+			const wpawLiquidity: BigNumber = pool.stakingTokenTotalAmount
+			farmData.poolData.balanceToken0 = wpawLiquidity
+			console.debug(`Benis is hodling ${ethers.utils.formatEther(wpawLiquidity)} wPAW`)
+			poolLiquidityUsd = wpawLiquidity.mul(wpawPriceUsd).div(BN_ONE)
 		} else {
 			farmData.poolData.symbol = 'LP'
 			const userInfo = await benis.userInfo(farmData.pid, this.account)
@@ -130,7 +130,7 @@ class FarmUtils {
 			farmData.poolData.priceToken1 = await this.getTokenPriceUsd(lpDetails.token1.address, signer, bep20)
 			farmData.poolData.symbolToken0 = await bep20.getTokenSymbol(lpDetails.token0.address, signer)
 			farmData.poolData.symbolToken1 = await bep20.getTokenSymbol(lpDetails.token1.address, signer)
-			farmData.userPendingRewards = await benis.pendingWBAN(farmData.pid, this.account)
+			farmData.userPendingRewards = await benis.pendingWPAW(farmData.pid, this.account)
 
 			const token0decimals = lpDetails.token0.decimals
 			const token1decimals = lpDetails.token1.decimals
@@ -162,15 +162,15 @@ class FarmUtils {
 		farmData.poolData.tvl = poolLiquidityUsd
 		console.debug(`Pool liquidity price: $${ethers.utils.formatEther(poolLiquidityUsd)}`)
 
-		farmData.apr = await benisUtils.getFarmAPR(farmData.pid, envName, wbanPriceUsd, poolLiquidityUsd, benis)
+		farmData.apr = await benisUtils.getFarmAPR(farmData.pid, envName, wpawPriceUsd, poolLiquidityUsd, benis)
 		return farmData
 	}
 
 	private async getTokenPriceUsd(address: string, signer: Signer, bep20: BEP20Utils): Promise<number> {
 		const symbol = await bep20.getTokenSymbol(address, signer)
-		// check if wBAN
-		if (address === this.wbanAddress) {
-			return this.banPriceInUSD
+		// check if wPAW
+		if (address === this.wpawAddress) {
+			return this.pawPriceInUSD
 		} else {
 			const price = this.prices.get(symbol)
 			if (price) {

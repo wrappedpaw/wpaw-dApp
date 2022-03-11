@@ -380,9 +380,9 @@ export default class Swaps extends Vue {
 	async mounted() {
 		// load tokens list
 		await TokensUtil.loadTokensList()
-		const wban = await TokensUtil.getTokenBySymbol('wBAN')
-		if (wban) {
-			Object.assign(this.from.token, wban)
+		const wpaw = await TokensUtil.getTokenBySymbol('wPAW')
+		if (wpaw) {
+			Object.assign(this.from.token, wpaw)
 		}
 		const usdc = await TokensUtil.getTokenBySymbol('USDC')
 		if (usdc) {

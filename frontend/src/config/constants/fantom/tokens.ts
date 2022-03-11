@@ -1,15 +1,15 @@
 import { TokensList } from '../types'
 
 const tokens: TokensList = {
-	wban: {
-		symbol: 'wBAN',
+	wpaw: {
+		symbol: 'wPAW',
 		address: {
 			dev: '',
 			staging: '0xc7338729799Ca67A489fb9edb7a8D88821002E10',
 			production: '0xe20B9e246db5a0d21BF9209E4858Bc9A3ff7A034',
 		},
 		decimals: 18,
-		projectLink: 'https://fantom.banano.cc/',
+		projectLink: 'https://fantom.paw.digital/',
 	},
 	ftm: {
 		symbol: 'FTM',
@@ -23,7 +23,7 @@ const tokens: TokensList = {
 			production: '0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83',
 		},
 		decimals: 18,
-		projectLink: 'https://fantom.banano.cc/',
+		projectLink: 'https://fantom.paw.digital/',
 	},
 	usdc: {
 		symbol: 'USDC',

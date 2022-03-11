@@ -1,5 +1,5 @@
 type HistoryRequest = {
-	banAddress: string
+	pawAddress: string
 	blockchainAddress: string
 }
 

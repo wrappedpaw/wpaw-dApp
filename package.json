@@ -1,14 +1,14 @@
 {
 	"name": "wpaw-smart-contract",
-	"version": "1.0.0",
-	"description": "dApp for swapping PAW to wPAW on Binance Smart Chain",
-	"author": "Wrap That PAW <wpaw@protonmail.com>",
+	"version": "1.5.0",
+	"description": "dApp for swapping BAN to wBAN on Binance Smart Chain",
+	"author": "Wrap That Paw <wpaw@protonmail.com>",
 	"license": "GPL-3.0-or-later",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/wrapped-paw/wpaw-dApp"
+		"url": "https://github.com/wrappedpaw/wpaw-dApp"
 	},
 	"keywords": [
 		"Paw",
@@ -32,7 +32,7 @@
 		"@nomiclabs/hardhat-solhint": "^2.0.0",
 		"@nomiclabs/hardhat-waffle": "^2.0.2",
 		"@openzeppelin/contracts-upgradeable": "^4.3.2",
-		"@openzeppelin/hardhat-upgrades": "1.10.0",
+		"@openzeppelin/hardhat-upgrades": "^1.10.0",
 		"@pancakeswap/pancake-swap-lib": "^0.0.4",
 		"@typechain/ethers-v5": "^9.0.0",
 		"@typechain/hardhat": "^4.0.0",
@@ -40,15 +40,14 @@
 		"@types/chai": "^4.2.21",
 		"@types/mocha": "^9.0.0",
 		"@types/node": "^14.14.37",
-		"ApeSwap-Banana-Farm": "https://github.com/ApeSwapFinance/apeswap-banana-farm",
-		"ApeSwap-Core-Contracts": "https://github.com/ApeSwapFinance/apeswap-swap-core",
+		"AnimalSwap-Treat-Farm": "https://github.com/wrappedpaw/animalswap-treat-farm",
+		"AnimalSwap-Core-Contracts": "https://github.com/wrappedpaw/animalswap-swap-core",
 		"chai": "^4.3.4",
 		"copyfiles": "^2.4.1",
 		"dotenv": "^8.2.0",
 		"ethereum-waffle": "^3.3.0",
 		"ethers": "^5.4.7",
 		"hardhat": "2.8.4",
-		"hardhat-deploy": "0.10.5",
 		"hardhat-abi-exporter": "^2.8.0",
 		"hardhat-dependency-compiler": "^1.1.2",
 		"hardhat-log-remover": "^2.0.2",
@@ -81,12 +80,13 @@
 		"lint": "prettier --check \"contracts/**/*.{sol,ts,js}\"",
 		"prettier": "prettier --write \"contracts/**/*.{sol,ts,js}\"",
 		"coverage": "yarn hardhat coverage",
-		"node:watch": "yarn hardhat node --watch",
-		"deploy:devnet": "npx hardhat run --network bscdevnet scripts/create-wban.js",
-		"deploy:testnet": "npx hardhat run --network bsctestnet scripts/create-wban.js"
+		"node:watch": "yarn hardhat node",
+		"deploy:devnet": "npx hardhat run --network bscdevnet scripts/create-wpaw.js",
+		"deploy:testnet": "npx hardhat run --network bsctestnet scripts/create-wpaw.js"
 	},
 	"dependencies": {
 		"@uniswap/v2-core": "^1.0.1",
-		"@uniswap/v2-periphery": "^1.1.0-beta.0"
+		"@uniswap/v2-periphery": "^1.1.0-beta.0",
+		"sqlite3": "^5.0.2"
 	}
 }

@@ -11,7 +11,7 @@
 			<q-separator class="bg-secondary" />
 			<q-card-section>
 				<div class="rewards">
-					<div class="title">wBAN Earned</div>
+					<div class="title">wPAW Earned</div>
 					<div class="row items-center">
 						<div class="col-7">
 							<q-skeleton type="rect" />
@@ -56,12 +56,12 @@
 			<q-separator class="bg-secondary" />
 			<q-card-section>
 				<div class="rewards">
-					<div class="title">wBAN Earned<span v-if="isFinished()"> (withdraw to harvest)</span></div>
+					<div class="title">wPAW Earned<span v-if="isFinished()"> (withdraw to harvest)</span></div>
 					<div class="row items-center">
 						<div class="col-8 row items-center q-gutter-xs">
 							<div class="col-auto">
 								{{ farmData.userPendingRewards | bnToTwoDecimalsString }} ({{
-									farmData.userPendingRewards | bnToExactString | banPrice
+									farmData.userPendingRewards | bnToExactString | pawPrice
 								}})
 							</div>
 						</div>
@@ -109,15 +109,15 @@
 
 						<div class="row">
 							<div class="col-2 text-right">Yield</div>
-							<div class="col-5 offset-1">{{ farmData.userPendingRewards | bnToSixDecimalsString }} wBAN</div>
-							<div class="col-4 text-right">{{ farmData.userPendingRewards | bnToExactString | banPrice }}</div>
+							<div class="col-5 offset-1">{{ farmData.userPendingRewards | bnToSixDecimalsString }} wPAW</div>
+							<div class="col-4 text-right">{{ farmData.userPendingRewards | bnToExactString | pawPrice }}</div>
 
 							<div class="col-2 text-right">Total</div>
 							<div class="col-5 offset-1">
-								<span v-if="isStaking()">{{ farmData.userGlobalBalance | bnToSixDecimalsString }} wBAN</span>
+								<span v-if="isStaking()">{{ farmData.userGlobalBalance | bnToSixDecimalsString }} wPAW</span>
 							</div>
 							<div class="col-4 text-right" v-if="isStaking()">
-								{{ farmData.userGlobalBalance | bnToExactString | banPrice }}
+								{{ farmData.userGlobalBalance | bnToExactString | pawPrice }}
 							</div>
 							<div class="col-4 text-right" v-if="!isStaking()">${{ farmData.totalValue | bnToTwoDecimalsString }}</div>
 						</div>
@@ -125,7 +125,7 @@
 							<div class="col-2 text-right">TVL</div>
 							<div class="col-5 offset-1">
 								<span v-if="isStaking()">
-									{{ farmData.poolData.balanceToken0 | bnToZeroDecimalsStringFilter }} wBAN
+									{{ farmData.poolData.balanceToken0 | bnToZeroDecimalsStringFilter }} wPAW
 								</span>
 							</div>
 							<div class="col-4 text-right">${{ farmData.poolData.tvl | bnToTwoDecimalsStringFilter }}</div>
@@ -141,7 +141,7 @@
 					<q-btn @click="beginSupply" v-if="lpTokenAllowance && isActive()" color="primary" flat>
 						<div class="text-button">Supply</div>
 						<q-tooltip>
-							When adding your liquidity tokens into the farm, you harvest your wBAN earned as well!
+							When adding your liquidity tokens into the farm, you harvest your wPAW earned as well!
 						</q-tooltip>
 					</q-btn>
 					<q-btn
@@ -153,7 +153,7 @@
 					>
 						<div class="text-button"><span v-if="isFinished()">Harvest &amp; </span>Withdraw</div>
 						<q-tooltip>
-							When withdrawing your liquidity tokens from the farm, you harvest your wBAN earned as well!
+							When withdrawing your liquidity tokens from the farm, you harvest your wPAW earned as well!
 						</q-tooltip>
 					</q-btn>
 				</q-btn-group>
@@ -174,7 +174,7 @@
 					/>
 				</q-card-section>
 				<q-card-section>
-					When adding your liquidity tokens into the farm, you harvest your wBAN earned as well!
+					When adding your liquidity tokens into the farm, you harvest your wPAW earned as well!
 				</q-card-section>
 				<q-card-actions align="right">
 					<q-btn flat label="Cancel" color="primary" v-close-popup />
@@ -197,7 +197,7 @@
 					/>
 				</q-card-section>
 				<q-card-section>
-					When withdrawing your liquidity tokens from the farm, you harvest your wBAN earned as well!
+					When withdrawing your liquidity tokens from the farm, you harvest your wPAW earned as well!
 				</q-card-section>
 				<q-card-actions align="right">
 					<q-btn flat label="Cancel" color="primary" v-close-popup />
@@ -212,7 +212,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import TokenInput from '@/components/farms/TokenInput.vue'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 import { BigNumber, Signer, ethers } from 'ethers'
 import { Benis } from '../../../../artifacts/typechain'
 import { FarmData, EMPTY_FARM_DATA, BN_ZERO } from '@/models/FarmData'
@@ -277,7 +277,7 @@ export default class Farm extends Vue {
 
 	signer!: Signer
 
-	wbanAddress: string = TokensUtil.getWBANAddress()
+	wpawAddress: string = TokensUtil.getWPAWAddress()
 
 	private farmUtils!: FarmUtils
 	private bep20 = new BEP20Utils()
@@ -288,7 +288,7 @@ export default class Farm extends Vue {
 	static BENIS_CONTRACT_ADDRESS: string = process.env.VUE_APP_BENIS_CONTRACT || ''
 
 	get symbol(): string {
-		return this.isStaking() ? 'wBAN' : 'LP'
+		return this.isStaking() ? 'wPAW' : 'LP'
 	}
 
 	get apr(): string {
@@ -300,7 +300,7 @@ export default class Farm extends Vue {
 	}
 
 	public isStaking(): boolean {
-		return this.wbanAddress === this.value.lpAddresses[Farm.ENV_NAME as keyof Address]
+		return this.wpawAddress === this.value.lpAddresses[Farm.ENV_NAME as keyof Address]
 	}
 
 	public isActive(): boolean {
@@ -337,15 +337,15 @@ export default class Farm extends Vue {
 				Farm.DEX_URL === 'https://pancakeswap.finance' ||
 				Farm.DEX_URL === 'https://spookyswap.finance'
 			) {
-				openURL(`${Farm.DEX_URL}/add/${this.wbanAddress}/${otherToken}`)
+				openURL(`${Farm.DEX_URL}/add/${this.wpawAddress}/${otherToken}`)
 			} else {
-				openURL(`${Farm.DEX_URL}/#/add/${this.wbanAddress}/${otherToken}`)
+				openURL(`${Farm.DEX_URL}/#/add/${this.wpawAddress}/${otherToken}`)
 			}
 		} else {
 			if (Farm.DEX_URL === 'https://spookyswap.finance') {
-				openURL(`${Farm.DEX_URL}/add/${this.wbanAddress}/FTM`)
+				openURL(`${Farm.DEX_URL}/add/${this.wpawAddress}/FTM`)
 			} else {
-				openURL(`${Farm.DEX_URL}/#/add/${this.wbanAddress}/ETH`)
+				openURL(`${Farm.DEX_URL}/#/add/${this.wpawAddress}/ETH`)
 			}
 		}
 	}
@@ -396,14 +396,14 @@ export default class Farm extends Vue {
 		if (this.provider) {
 			this.signer = this.provider.getSigner()
 
-			await ban.init()
+			await paw.init()
 			this.farmUtils = new FarmUtils()
 			this.farmData = await this.farmUtils.computeData(
 				this.value,
 				Farm.ENV_NAME,
 				this.account,
-				this.wbanAddress,
-				ban.banPriceInUSD,
+				this.wpawAddress,
+				paw.pawPriceInUSD,
 				this.prices,
 				this.signer,
 				this.benis

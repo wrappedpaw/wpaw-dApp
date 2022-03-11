@@ -26,7 +26,7 @@ class SwapDialogs {
 			type: 'positive',
 			html: true,
 			message: `Your token approval was processed succesfully.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: SwapDialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -88,7 +88,7 @@ class SwapDialogs {
 			type: 'positive',
 			html: true,
 			message: `Your swap was processed succesfully.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: SwapDialogs.TIMEOUT,
 			progress: true,
 			actions: [

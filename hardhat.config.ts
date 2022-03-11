@@ -1,4 +1,3 @@
-import 'hardhat-deploy';
 import 'dotenv/config';
 import { task, types } from "hardhat/config";
 import { HardhatUserConfig } from "hardhat/types";
@@ -27,7 +26,7 @@ if (!mnemonic) {
   mnemonic = 'test test test test test test test test test test test junk';
 }
 const accounts = { mnemonic };
-
+console.log("Using MNEMONIC: " + mnemonic);
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
   for (const account of accounts) {
@@ -35,100 +34,100 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
   }
 });
 
-task("wban:deploy", "Deploy wBAN")
+task("wpaw:deploy", "Deploy wPAW")
 	.setAction(async (args, hre) => {
 		const accounts = await hre.ethers.getSigners();
-		console.info(`Deploying wBAN with owner "${accounts[0].address}"`)
+		console.info(`Deploying wPAW with owner "${accounts[0].address}"`)
 
 		// deploy upgradeable contract
-		const WBANToken = await hre.ethers.getContractFactory("WBANToken");
-		const wban = await hre.upgrades.deployProxy(WBANToken);
-		await wban.deployed();
-		console.log(`wBAN proxy deployed at: "${wban.address}"`);
+		const WPAWToken = await hre.ethers.getContractFactory("WPAWToken");
+		const wpaw = await hre.upgrades.deployProxy(WPAWToken);
+		await wpaw.deployed();
+		console.log(`wPAW proxy deployed at: "${wpaw.address}"`);
 
 		// peer into OpenZeppelin manifest to extract the implementation address
 		const ozUpgradesManifestClient = await Manifest.forNetwork(hre.network.provider);
 		const manifest = await ozUpgradesManifestClient.read();
-		const bytecodeHash = hashBytecodeWithoutMetadata(WBANToken.bytecode);
+		const bytecodeHash = hashBytecodeWithoutMetadata(WPAWToken.bytecode);
 		const implementationContract = manifest.impls[bytecodeHash];
 
 		// verify implementation contract
 		if (implementationContract) {
-			console.log(`wBAN impl deployed at: "${implementationContract.address}"`);
+			console.log(`wPAW impl deployed at: "${implementationContract.address}"`);
 			await hre.run("verify:verify", {
 				address: implementationContract.address
 			});
 		}
 	});
 
-task("wban:verify", "Verify wBAN source code on blockchain explorer")
+task("wpaw:verify", "Verify wPAW source code on blockchain explorer")
 	.setAction(async (args, hre) => {
-		const WBANToken = await hre.ethers.getContractFactory("WBANToken");
+		const WPAWToken = await hre.ethers.getContractFactory("WPAWToken");
 
 		// peer into OpenZeppelin manifest to extract the implementation address
 		const ozUpgradesManifestClient = await Manifest.forNetwork(hre.network.provider);
 		const manifest = await ozUpgradesManifestClient.read();
-		const bytecodeHash = hashBytecodeWithoutMetadata(WBANToken.bytecode);
+		const bytecodeHash = hashBytecodeWithoutMetadata(WPAWToken.bytecode);
 		const implementationContract = manifest.impls[bytecodeHash];
 
 		// verify implementation contract
 		if (implementationContract) {
-			console.log(`wBAN impl deployed at: "${implementationContract.address}"`);
+			console.log(`wPAW impl deployed at: "${implementationContract.address}"`);
 			await hre.run("verify:verify", {
 				address: implementationContract.address
 			});
 		}
 	});
 
-task("wban:upgrade", "Upgrade wBAN")
+task("wpaw:upgrade", "Upgrade wPAW")
 	.addParam("contract", "The smart-contract address", '', types.string)
 	.setAction(async (args, hre) => {
 		const accounts = await hre.ethers.getSigners();
-		console.info(`Upgrading wBAN from owner "${accounts[0].address}"`)
+		console.info(`Upgrading wPAW from owner "${accounts[0].address}"`)
 
 		// deploy upgradeable contract
-		const WBANToken = await hre.ethers.getContractFactory("WBANToken");
-		const wban = WBANToken.attach(args.contract);
-		await hre.upgrades.upgradeProxy(wban, WBANToken);
+		const WPAWToken = await hre.ethers.getContractFactory("WPAWToken");
+		const wpaw = WPAWToken.attach(args.contract);
+		await hre.upgrades.upgradeProxy(wpaw, WPAWToken);
 
 		// peer into OpenZeppelin manifest to extract the implementation address
 		const ozUpgradesManifestClient = await Manifest.forNetwork(hre.network.provider);
 		const manifest = await ozUpgradesManifestClient.read();
-		const bytecodeHash = hashBytecodeWithoutMetadata(WBANToken.bytecode);
+		const bytecodeHash = hashBytecodeWithoutMetadata(WPAWToken.bytecode);
 		const implementationContract = manifest.impls[bytecodeHash];
 
 		// verify implementation contract
 		if (implementationContract) {
-			console.log(`wBAN impl deployed at: "${implementationContract.address}"`);
+			console.log(`wPAW impl deployed at: "${implementationContract.address}"`);
 			await hre.run("verify:verify", {
 				address: implementationContract.address
 			});
 		}
 	});
 
-task("wban:pause", "Pause wBAN -- [EMERGENCY ONLY]")
-	.addParam("wban", "The address of wBAN smart-contract", '', types.string)
+task("wpaw:pause", "Pause wPAW -- [EMERGENCY ONLY]")
+	.addParam("wpaw", "The address of wPAW smart-contract", '', types.string)
 	.setAction(async (args, hre) => {
-		const wbanAddress = args.wban;
-		const wban = await hre.ethers.getContractAt("WBANToken", wbanAddress)
-		await wban.pause()
+		const wpawAddress = args.wpaw;
+		const wpaw = await hre.ethers.getContractAt("WPAWToken", wpawAddress)
+		await wpaw.pause()
 	});
 
 task("benis:deploy", "Deploy Benis")
-	.addParam("wban", "The address of wBAN smart-contract", '', types.string)
-	.addParam("rewards", "The number of wBAN to reward per second", 1, types.float)
+	.addParam("wpaw", "The address of wPAW smart-contract", '', types.string)
+	.addParam("rewards", "The number of wPAW to reward per second", 1, types.float)
 	.addParam("starttime", "The timestamp at which Benis farms should start", 0, types.int)
 	.setAction(async (args, hre) => {
-		const wbanAddress = args.wban;
+		const wpawAddress = args.wpaw;
 		const rewardsPerSecond = hre.ethers.utils.parseEther(args.rewards.toString());
 		let rewardsStartTime = args.starttime == 0 ? (await hre.ethers.provider.getBlock('latest')).timestamp : args.starttime;
 		const Benis = await hre.ethers.getContractFactory("Benis");
-		const benis = await Benis.deploy(wbanAddress, rewardsPerSecond, rewardsStartTime);
+		const benis = await Benis.deploy(wpawAddress, rewardsPerSecond, rewardsStartTime);
 		await benis.deployed();
 		await hre.run("verify:verify", {
 			address: benis.address,
 			constructorArguments: [
-				wbanAddress,
+				wpawAddress,
 				rewardsPerSecond,
 				rewardsStartTime
 			]
@@ -138,8 +137,8 @@ task("benis:deploy", "Deploy Benis")
 
 task("benis:verify", "Verify Benis source code on blockchain explorer")
 	.addParam("benis", "The address of Benis smart-contract", '', types.string)
-	.addParam("wban", "The address of wBAN smart-contract", '', types.string)
-	.addParam("rewards", "The number of wBAN to reward per second", 1, types.float)
+	.addParam("wpaw", "The address of wPAW smart-contract", '', types.string)
+	.addParam("rewards", "The number of wPAW to reward per second", 1, types.float)
 	.addParam("starttime", "The timestamp at which Benis farms should start", 0, types.int)
 	.setAction(async (args, hre) => {
 		const benisAddress = args.benis;
@@ -149,7 +148,7 @@ task("benis:verify", "Verify Benis source code on blockchain explorer")
 		await hre.run("verify:verify", {
 			address: benisAddress,
   		constructorArguments: [
-				args.wban,
+				args.wpaw,
 				rewardsPerSecond,
 				rewardsStartTime
 			]
@@ -168,13 +167,13 @@ task("benis:add-time", "Deploy Benis")
 
 task("benis:change-rewards", "Changes Benis rewards per second")
 	.addParam("benis", "The address of Benis smart-contract", '', types.string)
-	.addParam("rewards", "The number of wBAN to reward per second", 1, types.float)
+	.addParam("rewards", "The number of wPAW to reward per second", 1, types.float)
 	.setAction(async (args, hre) => {
 		const benisAddress = args.benis;
 		const rewardsPerSecond = hre.ethers.utils.parseEther(args.rewards.toString());
 		console.log(`Rewards per second: ${hre.ethers.utils.formatEther(rewardsPerSecond)}`);
 		const benis = await hre.ethers.getContractAt("Benis", benisAddress);
-		await benis.setWBANPerSecond(rewardsPerSecond, true);
+		await benis.setWPAWPerSecond(rewardsPerSecond, true);
 	});
 
 task("benis:alloc-pool", "Change allocation points")
@@ -191,7 +190,7 @@ task("benis:alloc-pool", "Change allocation points")
 
 task("benis:create-pool", "Create a farm")
 	.addParam("benis", "The address of Benis smart-contract", '', types.string)
-	.addParam("lp", "The address of the LP token or wBAN", '', types.string)
+	.addParam("lp", "The address of the LP token or wPAW", '', types.string)
 	.addParam("alloc", "The allocation points for this pool", 1000, types.int)
 	.setAction(async (args, hre) => {
 		const benisAddress = args.benis;
@@ -336,8 +335,8 @@ const config: HardhatUserConfig = {
 	dependencyCompiler: {
 		paths: [
 			'@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol',
-			'ApeSwap-Banana-Farm/contracts/libs/MockBEP20.sol',
-			'ApeSwap-Core-Contracts/contracts/ApeFactory.sol',
+			'AnimalSwap-Treat-Farm/contracts/libs/MockBEP20.sol',
+			'AnimalSwap-Core-Contracts/contracts/AnimalFactory.sol',
 		],
 	},
 	spdxLicenseIdentifier: {
@@ -363,7 +362,7 @@ const config: HardhatUserConfig = {
 		path: './abi',
 		clear: true,
 		flat: true,
-		// only: ['WBANToken', 'Benis'],
+		// only: ['WPAWToken', 'Benis'],
 		spacing: 2
 	}
 };

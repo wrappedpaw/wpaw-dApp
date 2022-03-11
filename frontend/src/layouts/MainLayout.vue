@@ -4,16 +4,16 @@
 			<q-toolbar class="bg-toolbar text-white">
 				<q-btn v-if="drawerEnabled" dense flat round icon="menu" @click="drawerOpened = !drawerOpened" />
 				<a @click="home" class="gt-xs">
-					<img :src="require(`@/assets/wban-logo-${expectedBlockchain.network}.svg`)" class="currency-logo" />
+					<img :src="require(`@/assets/wpaw-logo-${expectedBlockchain.network}.svg`)" class="currency-logo" />
 				</a>
 				<q-toolbar-title @click="home">{{ appTitle }}</q-toolbar-title>
 				<q-btn v-if="!isUserConnected" @click="connectWalletProvider" flat dense>Connect</q-btn>
 				<q-chip v-if="isUserConnected && !isMainnet" square color="red" text-color="white" icon="warning" class="gt-xs">
 					You're not on the mainnet but {{ chainName }}!
 				</q-chip>
-				<q-avatar v-if="banAddress" class="gt-xs">
-					<img @click="openBan(banAddress)" :src="banAddressPicture" :alt="banAddress" />
-					<q-tooltip>{{ banAddress }}</q-tooltip>
+				<q-avatar v-if="pawAddress" class="gt-xs">
+					<img @click="openPaw(pawAddress)" :src="pawAddressPicture" :alt="pawAddress" />
+					<q-tooltip>{{ pawAddress }}</q-tooltip>
 				</q-avatar>
 				<q-btn
 					v-if="isUserConnected"
@@ -26,10 +26,6 @@
 				>
 					<q-tooltip>{{ activeAccount }}</q-tooltip>
 				</q-btn>
-				<q-btn flat round dense @click="openNftPage()">
-					<q-icon name="img:nft.svg" />
-					<q-tooltip>wBAN NFTs</q-tooltip>
-				</q-btn>
 				<q-btn flat round dense icon="redeem" class="text-primary">
 					<q-menu id="donations">
 						<div class="row no-wrap q-pa-md">
@@ -38,13 +34,13 @@
 								<p>Working on this app has been quite a journey, and still going on!</p>
 								<p>
 									Tips are always appreciated and if you would like to support my efforts, you can always help me by
-									sending Banano tips at: <span class="banano-address">{{ banWalletForTips }}</span>
+									sending Paw tips at: <span class="paw-address">{{ pawWalletForTips }}</span>
 								</p>
 							</div>
 							<q-separator vertical inset class="q-mx-lg" />
 							<div class="column items-center" v-if="$q.platform.is.desktop">
 								<div class="text-subtitle1 q-mt-md q-mb-xs">Tip me at:</div>
-								<q-icon :name="banWalletForTipsQRCode" size="200px" />
+								<q-icon :name="pawWalletForTipsQRCode" size="200px" />
 							</div>
 							<q-btn v-if="$q.platform.is.mobile" color="primary" text-color="secondary" label="OK" v-close-popup />
 						</div>
@@ -66,30 +62,30 @@
 			:breakpoint="500"
 		>
 			<q-list>
-				<q-item clickable v-ripple @click="depositBAN">
+				<q-item clickable v-ripple @click="depositPAW">
 					<q-item-section avatar>
-						<q-icon name="img:ban-deposit.svg" size="3em" />
+						<q-icon name="img:paw-deposit.svg" size="3em" />
 					</q-item-section>
 					<q-separator vertical inset />
-					<q-item-section>Deposit BAN</q-item-section>
+					<q-item-section>Deposit PAW</q-item-section>
 				</q-item>
-				<q-item clickable v-ripple @click="withdrawBAN">
+				<q-item clickable v-ripple @click="withdrawPAW">
 					<q-item-section avatar>
-						<q-icon name="img:ban-withdraw.svg" size="3em" />
+						<q-icon name="img:paw-withdraw.svg" size="3em" />
 					</q-item-section>
 					<q-separator vertical inset />
-					<q-item-section>Withdraw BAN</q-item-section>
+					<q-item-section>Withdraw PAW</q-item-section>
 				</q-item>
 				<q-item clickable v-ripple @click="swap">
 					<q-item-section avatar>
-						<q-icon name="img:wban-swap.svg" size="3em" />
+						<q-icon name="img:wpaw-swap.svg" size="3em" />
 					</q-item-section>
 					<q-separator vertical inset />
 					<q-item-section>Swap</q-item-section>
 				</q-item>
 				<q-item clickable v-ripple to="/farms">
 					<q-item-section avatar>
-						<q-icon name="img:wban-farming.svg" size="3em" />
+						<q-icon name="img:wpaw-farming.svg" size="3em" />
 					</q-item-section>
 					<q-separator vertical inset />
 					<q-item-section>Stake &amp; Farm</q-item-section>
@@ -107,21 +103,21 @@
 		<q-footer class="bg-footer">
 			<span @click="openGithub(appVersion)">
 				<q-icon name="fab fa-github" size="20px" style="margin-top: -3px" />
-				wBAN v{{ appVersion }}
+				wPAW v{{ appVersion }}
 			</span>
 			-
 			<span class="social">
-				<a href="https://wrap-that-potassium.gitbook.io/wban/introduction/quick-tour" target="_blank">
+				<a href="https://wrap-that-potassium.gitbook.io/wpaw/introduction/quick-tour" target="_blank">
 					<q-icon name="live_help" color="white" size="24px" style="margin-top: -3px">
 						<q-tooltip>Documentation</q-tooltip>
 					</q-icon>
 				</a>
-				<a href="https://chat.banano.cc" target="_blank">
+				<a href="https://chat.paw.digital" target="_blank">
 					<q-icon name="fab fa-discord" color="white" size="20px" style="margin-top: -3px">
 						<q-tooltip>Discord</q-tooltip>
 					</q-icon>
 				</a>
-				<a href="https://t.me/banano_official" target="_blank">
+				<a href="https://t.me/paw_digital" target="_blank">
 					<q-icon name="fab fa-telegram" color="white" size="20px" style="margin-top: -3px">
 						<q-tooltip>Telegram</q-tooltip>
 					</q-icon>
@@ -137,7 +133,7 @@ import { namespace } from 'vuex-class'
 import { Screen } from 'quasar'
 import router from '@/router'
 import accounts from '@/store/modules/accounts'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 import backend from '@/store/modules/backend'
 import prices from '@/store/modules/prices'
 import SettingsMenu from '@/components/SettingsMenu.vue'
@@ -147,7 +143,7 @@ import { openURL } from 'quasar'
 import { Network, Networks, BSC_MAINNET, POLYGON_MAINNET, FANTOM_MAINNET } from '@/utils/Networks'
 
 const accountsStore = namespace('accounts')
-const banStore = namespace('ban')
+const pawStore = namespace('paw')
 const backendStore = namespace('backend')
 const contractsStore = namespace('contracts')
 
@@ -175,11 +171,11 @@ export default class MainLayout extends Vue {
 	@accountsStore.State('activeAccount')
 	activeAccount!: string
 
-	@banStore.Getter('banAddress')
-	banAddress!: string
+	@pawStore.Getter('pawAddress')
+	pawAddress!: string
 
-	@banStore.Getter('banAddressPicture')
-	banAddressPicture!: string
+	@pawStore.Getter('pawAddressPicture')
+	pawAddressPicture!: string
 
 	@backendStore.Getter('online')
 	backendOnline!: boolean
@@ -193,14 +189,14 @@ export default class MainLayout extends Vue {
 	@backendStore.Getter('errorLink')
 	errorLink!: string
 
-	@contractsStore.Getter('wbanAddress')
-	wbanAddress!: string
+	@contractsStore.Getter('wpawAddress')
+	wpawAddress!: string
 
-	appTitle: string = process.env.VUE_APP_TITLE || 'wBAN -- Broken Release!!!'
+	appTitle: string = process.env.VUE_APP_TITLE || 'wPAW -- Broken Release!!!'
 	appVersion: string = process.env.VUE_APP_VERSION || '0'
 
-	banWalletForTips = 'ban_1wban1mwe1ywc7dtknaqdbog5g3ah333acmq8qxo5anibjqe4fqz9x3xz6ky'
-	banWalletForTipsQRCode = ''
+	pawWalletForTips = 'paw_1wpaw1mwe1ywc7dtknaqdbog5g3ah333acmq8qxo5anibjqe4fqz9x3xz6ky'
+	pawWalletForTipsQRCode = ''
 
 	drawerOpened = false
 
@@ -232,13 +228,13 @@ export default class MainLayout extends Vue {
 		}
 	}
 
-	depositBAN() {
-		document.dispatchEvent(new CustomEvent('deposit-ban'))
+	depositPAW() {
+		document.dispatchEvent(new CustomEvent('deposit-paw'))
 		this.drawerOpened = false
 	}
 
-	withdrawBAN() {
-		document.dispatchEvent(new CustomEvent('withdraw-ban'))
+	withdrawPAW() {
+		document.dispatchEvent(new CustomEvent('withdraw-paw'))
 		this.drawerOpened = false
 	}
 
@@ -249,18 +245,18 @@ export default class MainLayout extends Vue {
 
 	async created() {
 		await accounts.initWalletProvider()
-		await ban.init()
-		await backend.initBackend(this.banAddress)
+		await paw.init()
+		await backend.initBackend(this.pawAddress)
 		await prices.loadPrices()
 		try {
-			const qrcode: string = await QRCode.toDataURL(this.banWalletForTips, {
+			const qrcode: string = await QRCode.toDataURL(this.pawWalletForTips, {
 				scale: 6,
 				color: {
 					dark: '2A2A2E',
 					light: 'FBDD11',
 				},
 			})
-			this.banWalletForTipsQRCode = `img:${qrcode}`
+			this.pawWalletForTipsQRCode = `img:${qrcode}`
 		} catch (err) {
 			console.error(err)
 		}
@@ -278,20 +274,12 @@ export default class MainLayout extends Vue {
 		openURL(`${this.blockExplorerUrl}/address/${address}`)
 	}
 
-	openBan(address: string) {
-		openURL(`https://creeper.banano.cc/explorer/account/${address}`)
+	openPaw(address: string) {
+		openURL(`https://tracker.paw.digital/account/${address}`)
 	}
 
 	openGithub(version: string) {
-		openURL(`https://github.com/wBanano/wban-dApp/releases/tag/v${version}`)
-	}
-
-	openNftPage() {
-		if (this.chainId === POLYGON_MAINNET.chainIdNumber) {
-			router.push('/nft')
-		} else {
-			openURL('https://opensea.io/collection/wban')
-		}
+		openURL(`https://github.com/wrappedpaw/wpaw-dApp/releases/tag/v${version}`)
 	}
 }
 </script>

@@ -2,12 +2,12 @@ import { getModule, VuexModule, Module, Mutation, Action } from 'vuex-module-dec
 import { namespace } from 'vuex-class'
 import { BindingHelpers } from 'vuex-class/lib/bindings'
 import store from '@/store'
-import { WBANToken, WBANToken__factory } from '@artifacts/typechain'
+import { WPAWToken, WPAWToken__factory } from '@artifacts/typechain'
 import { ethers, BigNumber, Signature } from 'ethers'
-import { SwapToBanRequest } from '@/models/SwapToBanRequest'
+import { SwapToPawRequest } from '@/models/SwapToPawRequest'
 import { LoadBalancesFromContractRequest } from '@/models/LoadBalancesFromContractRequest'
 import Dialogs from '@/utils/Dialogs'
-import { SwapToWBanRequest } from '@/models/SwapToWBanRequest'
+import { SwapToWPawRequest } from '@/models/SwapToWPawRequest'
 import TokensUtil from '@/utils/TokensUtil'
 
 @Module({
@@ -17,17 +17,17 @@ import TokensUtil from '@/utils/TokensUtil'
 	dynamic: true,
 })
 class ContractsModule extends VuexModule {
-	private _wBanToken: WBANToken | null = null
+	private _wPawToken: WPAWToken | null = null
 	private _owner = ''
 	private _totalSupply: BigNumber = BigNumber.from(0)
-	private _wBanBalance: BigNumber = BigNumber.from(0)
+	private _wPawBalance: BigNumber = BigNumber.from(0)
 
-	get wbanContract() {
-		return this._wBanToken
+	get wpawContract() {
+		return this._wPawToken
 	}
 
-	get wbanAddress() {
-		return this._wBanToken ? this._wBanToken.address : ''
+	get wpawAddress() {
+		return this._wPawToken ? this._wPawToken.address : ''
 	}
 
 	get owner() {
@@ -38,13 +38,13 @@ class ContractsModule extends VuexModule {
 		return this._totalSupply
 	}
 
-	get wBanBalance() {
-		return this._wBanBalance
+	get wPawBalance() {
+		return this._wPawBalance
 	}
 
 	@Mutation
-	setWBANToken(contract: WBANToken) {
-		this._wBanToken = contract
+	setWPAWToken(contract: WPAWToken) {
+		this._wPawToken = contract
 	}
 
 	@Mutation
@@ -58,8 +58,8 @@ class ContractsModule extends VuexModule {
 	}
 
 	@Mutation
-	setWBANBalance(balance: BigNumber) {
-		this._wBanBalance = balance
+	setWPAWBalance(balance: BigNumber) {
+		this._wPawBalance = balance
 	}
 
 	@Action
@@ -68,14 +68,14 @@ class ContractsModule extends VuexModule {
 		console.debug('in initContract')
 		if (provider) {
 			// do not initialize contract if this was done earlier
-			if (!this._wBanToken) {
-				const contract = WBANToken__factory.connect(TokensUtil.getWBANAddress(), provider.getSigner())
-				this.context.commit('setWBANToken', contract)
+			if (!this._wPawToken) {
+				const contract = WPAWToken__factory.connect(TokensUtil.getWPAWAddress(), provider.getSigner())
+				this.context.commit('setWPAWToken', contract)
 
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				const totalSupplyUpdateFn = async (_from: string, _to: string, _amount: BigNumber, _event: ethers.Event) => {
 					const totalSupply: BigNumber = await contract.totalSupply()
-					console.log(`Total Supply: ${ethers.utils.formatEther(totalSupply)} wBAN`)
+					console.log(`Total Supply: ${ethers.utils.formatEther(totalSupply)} wPAW`)
 					this.setTotalSupply(totalSupply)
 				}
 				// update total supply on mints
@@ -90,11 +90,11 @@ class ContractsModule extends VuexModule {
 				)
 			}
 			// at this point the contract should be initialized
-			if (!this._wBanToken) {
+			if (!this._wPawToken) {
 				console.error('Smart-contract client not initialized')
 				return
 			}
-			const contract = this._wBanToken
+			const contract = this._wPawToken
 			const owner = await contract.owner()
 			const totalSupply: BigNumber = await contract.totalSupply()
 			this.setOwner(owner)
@@ -107,40 +107,40 @@ class ContractsModule extends VuexModule {
 		const { contract, account } = request
 		console.debug(`in loadBalances for account: ${account}`)
 		const balance = await contract.balanceOf(account)
-		console.info(`Balance is ${ethers.utils.formatEther(balance)} wBAN`)
-		this.context.commit('setWBANBalance', balance)
+		console.info(`Balance is ${ethers.utils.formatEther(balance)} wPAW`)
+		this.context.commit('setWPAWBalance', balance)
 	}
 
 	@Action
-	updateWBanBalance(balance: BigNumber) {
-		this.context.commit('setWBANBalance', balance)
+	updateWPawBalance(balance: BigNumber) {
+		this.context.commit('setWPAWBalance', balance)
 	}
 
 	@Action
-	async reloadWBANBalance(request: LoadBalancesFromContractRequest) {
+	async reloadWPAWBalance(request: LoadBalancesFromContractRequest) {
 		const { contract, account } = request
 		if (!contract || !account) {
 			throw new Error(`Bad request ${JSON.stringify(request)}`)
 		}
-		const wbanBalance = await contract.balanceOf(account)
-		console.info(`Balance ${ethers.utils.formatEther(wbanBalance)} wBAN`)
-		this.context.commit('setWBANBalance', wbanBalance)
+		const wpawBalance = await contract.balanceOf(account)
+		console.info(`Balance ${ethers.utils.formatEther(wpawBalance)} wPAW`)
+		this.context.commit('setWPAWBalance', wpawBalance)
 	}
 
 	@Action
-	async mint(swapRequest: SwapToWBanRequest): Promise<string> {
-		console.debug('Minting wBAN')
+	async mint(swapRequest: SwapToWPawRequest): Promise<string> {
+		console.debug('Minting wPAW')
 		const { amount, blockchainWallet, receipt, uuid, contract } = swapRequest
 		const signature: Signature = ethers.utils.splitSignature(receipt)
 		const txn = await contract.mintWithReceipt(blockchainWallet, amount, uuid, signature.v, signature.r, signature.s)
 		await txn.wait()
-		console.debug(`wBAN minted in transaction ${txn.hash}`)
+		console.debug(`wPAW minted in transaction ${txn.hash}`)
 		return txn.hash
 	}
 
 	@Action
-	async claim(swapRequest: SwapToWBanRequest): Promise<string> {
-		console.log('Claiming wBAN')
+	async claim(swapRequest: SwapToWPawRequest): Promise<string> {
+		console.log('Claiming wPAW')
 		const { amount, blockchainWallet, receipt, uuid, contract } = swapRequest
 		console.debug(`Amount: ${amount}, blockchainWallet: ${blockchainWallet}, receipt: ${receipt}, uuid: ${uuid}`)
 		const signature: Signature = ethers.utils.splitSignature(receipt)
@@ -150,11 +150,11 @@ class ContractsModule extends VuexModule {
 	}
 
 	@Action
-	async swap(swapRequest: SwapToBanRequest) {
-		const { amount, toBanAddress, contract } = swapRequest
-		console.log(`Should swap ${ethers.utils.formatEther(amount)} wBAN to BAN for "${toBanAddress}"`)
-		const txn = await contract.swapToBan(toBanAddress, amount)
-		Dialogs.startSwapToBan(ethers.utils.formatEther(amount))
+	async swap(swapRequest: SwapToPawRequest) {
+		const { amount, toPawAddress, contract } = swapRequest
+		console.log(`Should swap ${ethers.utils.formatEther(amount)} wPAW to PAW for "${toPawAddress}"`)
+		const txn = await contract.swapToPaw(toPawAddress, amount)
+		Dialogs.startSwapToPaw(ethers.utils.formatEther(amount))
 		await txn.wait()
 	}
 }

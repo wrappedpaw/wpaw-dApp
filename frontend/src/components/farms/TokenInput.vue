@@ -30,13 +30,13 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Ref, Vue } from 'vue-property-decorator'
 import { BigNumber, ethers } from 'ethers'
-import { bnToExactStringFilter, banPriceFilter } from '@/utils/filters'
+import { bnToExactStringFilter, pawPriceFilter } from '@/utils/filters'
 import accounts from '@/store/modules/accounts'
 
 @Component({
 	filters: {
 		bnToExactStringFilter,
-		banPriceFilter,
+		pawPriceFilter,
 	},
 })
 export default class TokenInput extends Vue {
@@ -67,8 +67,8 @@ export default class TokenInput extends Vue {
 		}
 	}
 
-	addWBANToMetaMask() {
-		accounts.addWBANTokenToMetaMask()
+	addWPAWToMetaMask() {
+		accounts.addWPAWTokenToMetaMask()
 	}
 
 	emitEvent(event: string) {
@@ -99,7 +99,7 @@ body.body--light .bg-token-chooser
 	background-color: lighten($secondary, 75%) !important
 body.body--dark .bg-token-chooser
 	background-color: lighten($secondary, 10%) !important
-body.body--dark #add-wban-to-metamask
+body.body--dark #add-wpaw-to-metamask
 	color: $primary
 	cursor: pointer
 	font-size: .8em

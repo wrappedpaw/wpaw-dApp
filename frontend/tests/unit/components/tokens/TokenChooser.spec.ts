@@ -7,8 +7,8 @@ import { Token } from '@/config/constants/dex'
 describe("TokenChooser", () => {
 	let wrapper: Wrapper<any>
 	const token: Token = {
-		name: 'Wrapped Banano',
-		symbol: 'wBAN',
+		name: 'Wrapped Paw',
+		symbol: 'wPAW',
 		address: '',
 		logoURI: '',
 		decimals: 18,
@@ -30,7 +30,7 @@ describe("TokenChooser", () => {
 
 	it('expects something', async () => {
 		expect(wrapper).toBeTruthy()
-		expect(wrapper.find('span.symbol').text()).toMatch('wBAN')
+		expect(wrapper.find('span.symbol').text()).toMatch('wPAW')
 		// console.debug(wrapper.find('.token-display'))
 		// await wrapper.find('.token-display').trigger('click')
 		// await sleep(1_000)

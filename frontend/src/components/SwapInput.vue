@@ -33,14 +33,14 @@ import { namespace } from 'vuex-class'
 import SwapCurrencyInput from '@/components/SwapCurrencyInput.vue'
 import { ethers, BigNumber } from 'ethers'
 import accounts from '@/store/modules/accounts'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 import backend from '@/store/modules/backend'
 import contracts from '@/store/modules/contracts'
-import { WBANToken } from '../../../artifacts/typechain'
+import { WPAWToken } from '../../../artifacts/typechain'
 import Dialogs from '@/utils/Dialogs'
 import { Network, Networks } from '@/utils/Networks'
 
-const banStore = namespace('ban')
+const pawStore = namespace('paw')
 const accountsStore = namespace('accounts')
 
 @Component({
@@ -49,16 +49,16 @@ const accountsStore = namespace('accounts')
 	},
 })
 export default class SwapInput extends Vue {
-	@Prop({ type: Object, required: true }) banBalance!: BigNumber
-	@Prop({ type: Object, required: true }) wBanBalance!: BigNumber
+	@Prop({ type: Object, required: true }) pawBalance!: BigNumber
+	@Prop({ type: Object, required: true }) wPawBalance!: BigNumber
 	@Ref('from') readonly fromInput!: SwapCurrencyInput
 	@Ref('to') readonly toInput!: SwapCurrencyInput
 
 	fromCurrency = ''
 	toCurrency = ''
 
-	@banStore.Getter('banAddress')
-	banAddress!: string
+	@pawStore.Getter('pawAddress')
+	pawAddress!: string
 
 	@accountsStore.Getter('activeCryptoBalance')
 	cryptoBalance!: string
@@ -67,23 +67,23 @@ export default class SwapInput extends Vue {
 	swapInProgress = false
 
 	get fromBalance() {
-		if (this.fromCurrency === 'BAN') {
-			return this.banBalance
+		if (this.fromCurrency === 'PAW') {
+			return this.pawBalance
 		} else {
-			return this.wBanBalance
+			return this.wPawBalance
 		}
 	}
 
 	get toBalance() {
-		if (this.toCurrency === 'BAN') {
-			return this.banBalance
+		if (this.toCurrency === 'PAW') {
+			return this.pawBalance
 		} else {
-			return this.wBanBalance
+			return this.wPawBalance
 		}
 	}
 
 	get swapLabel() {
-		if (this.toCurrency === 'BAN') {
+		if (this.toCurrency === 'PAW') {
 			return 'Unwrap'
 		} else {
 			return 'Wrap'
@@ -125,7 +125,7 @@ export default class SwapInput extends Vue {
 			`Required crypto balance: ${this.expectedBlockchain.minimumNeededForWrap} ${this.expectedBlockchain.nativeCurrency.symbol}`
 		)
 		if (
-			this.fromCurrency === 'BAN' &&
+			this.fromCurrency === 'PAW' &&
 			Number.parseFloat(this.cryptoBalance) < this.expectedBlockchain.minimumNeededForWrap
 		) {
 			Dialogs.showGasNeededError(Number.parseFloat(this.cryptoBalance))
@@ -134,7 +134,7 @@ export default class SwapInput extends Vue {
 			console.info(`Crypto balance is: ${this.cryptoBalance} ${this.expectedBlockchain.nativeCurrency.symbol}`)
 		}
 
-		// warn use if wrapping/unwrapping less than 100 BAN/wBAN
+		// warn use if wrapping/unwrapping less than 100 PAW/wPAW
 		if (Number.parseFloat(this.amount) <= 100) {
 			const proceed = await Dialogs.showLowAmountToWrapWarning(Number.parseFloat(this.amount))
 			if (!proceed) {
@@ -144,20 +144,20 @@ export default class SwapInput extends Vue {
 
 		if (accounts.activeAccount && this.amount) {
 			this.swapInProgress = true
-			if (this.fromCurrency === 'BAN') {
+			if (this.fromCurrency === 'PAW') {
 				await backend.swap({
 					amount: Number.parseFloat(this.amount),
-					banAddress: ban.banAddress,
+					pawAddress: paw.pawAddress,
 					blockchainAddress: accounts.activeAccount,
 					provider: accounts.providerEthers,
 				})
 			} else {
-				const contract: WBANToken | null = contracts.wbanContract
+				const contract: WPAWToken | null = contracts.wpawContract
 				if (contract) {
-					console.info(`Swap from wBAN to BAN requested for ${this.amount} BAN to ${this.banAddress}`)
+					console.info(`Swap from wPAW to PAW requested for ${this.amount} PAW to ${this.pawAddress}`)
 					await contracts.swap({
 						amount: ethers.utils.parseEther(this.amount),
-						toBanAddress: this.banAddress,
+						toPawAddress: this.pawAddress,
 						contract,
 					})
 				}
@@ -169,8 +169,8 @@ export default class SwapInput extends Vue {
 	}
 
 	created() {
-		this.fromCurrency = 'BAN'
-		this.toCurrency = 'wBAN'
+		this.fromCurrency = 'PAW'
+		this.toCurrency = 'wPAW'
 	}
 }
 </script>

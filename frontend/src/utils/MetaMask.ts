@@ -10,10 +10,10 @@ class MetaMask {
 		return ethereum && ethereum.isMetaMask
 	}
 
-	static async addWBANToWallet(): Promise<void> {
-		const logo = await import(`../assets/wban-logo-${MetaMask.BLOCKCHAIN}.svg`)
+	static async addWPAWToWallet(): Promise<void> {
+		const logo = await import(`../assets/wpaw-logo-${MetaMask.BLOCKCHAIN}.svg`)
 		const logoUrl = `${window.location.origin}${logo.default}`
-		MetaMask.addTokenToWallet(TokensUtil.getWBANAddress(), 'wBAN', 18, logoUrl)
+		MetaMask.addTokenToWallet(TokensUtil.getWPAWAddress(), 'wPAW', 18, logoUrl)
 	}
 
 	static async addTokenToWallet(address: string, symbol: string, decimals: number, logoURI: string): Promise<void> {

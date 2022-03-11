@@ -41,7 +41,7 @@ class PricesModule extends VuexModule {
 				url: `${PricesModule.BACKEND_URL}/prices`,
 			})
 			const apiResponse = resp.data
-			const wbanPrice: number = apiResponse.ban
+			const wpawPrice: number = apiResponse.paw
 			const bnbPrice: number = apiResponse.bnb
 			const ethPrice: number = apiResponse.eth
 			const maticPrice: number = apiResponse.matic
@@ -49,7 +49,7 @@ class PricesModule extends VuexModule {
 			const prices: Map<string, number> = new Map()
 			prices.set('BUSD', 1)
 			prices.set('USDC', 1)
-			prices.set('wBAN', wbanPrice)
+			prices.set('wPAW', wpawPrice)
 			prices.set('WBNB', bnbPrice)
 			prices.set('BNB', bnbPrice)
 			prices.set('WETH', ethPrice)

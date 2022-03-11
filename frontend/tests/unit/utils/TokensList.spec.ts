@@ -16,27 +16,27 @@ describe('TokensUtil', () => {
 			.reply(200, tokenList)
 	})
 
-	it('finds wBAN address', async () => {
-		const wbanAddress = TokensList.getWBANAddress()
-		expect(wbanAddress).to.not.be.undefined
+	it('finds wPAW address', async () => {
+		const wpawAddress = TokensList.getWPAWAddress()
+		expect(wpawAddress).to.not.be.undefined
 	})
 
-	it('finds wBAN token by address', async () => {
-		const wban = await TokensList.getToken('0xe20b9e246db5a0d21bf9209e4858bc9a3ff7a034')
-		expect(wban).to.not.be.undefined
-		if (wban === undefined) {
+	it('finds wPAW token by address', async () => {
+		const wpaw = await TokensList.getToken('0xe20b9e246db5a0d21bf9209e4858bc9a3ff7a034')
+		expect(wpaw).to.not.be.undefined
+		if (wpaw === undefined) {
 			throw Error()
 		}
-		expect(wban.symbol).to.equal('wBAN')
+		expect(wpaw.symbol).to.equal('wPAW')
 	})
 
-	it('finds wBAN token by symbol', async () => {
-		const wban = await TokensList.getTokenBySymbol('wBAN')
-		expect(wban).to.not.be.undefined
-		if (wban === undefined) {
+	it('finds wPAW token by symbol', async () => {
+		const wpaw = await TokensList.getTokenBySymbol('wPAW')
+		expect(wpaw).to.not.be.undefined
+		if (wpaw === undefined) {
 			throw Error()
 		}
-		expect(wban.symbol).to.equal('wBAN')
+		expect(wpaw.symbol).to.equal('wPAW')
 	})
 
 	it('finds plenty of tokens', async () => {
@@ -45,7 +45,7 @@ describe('TokensUtil', () => {
 	})
 
 	it('filters tokens', async () => {
-		let tokens = await TokensList.filterTokens('wban', '0x0', null)
+		let tokens = await TokensList.filterTokens('wpaw', '0x0', null)
 		expect(tokens).to.have.lengthOf(1)
 
 		tokens = await TokensList.filterTokens('usdc', '0x0', null)

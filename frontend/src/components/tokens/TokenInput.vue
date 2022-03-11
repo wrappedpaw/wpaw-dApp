@@ -7,7 +7,7 @@
 			<q-item-section top class="col-9 text-right" v-if="value.token">
 				<q-item-label>
 					Balance: {{ balanceFormatted }} {{ value.token.symbol }}
-					<span v-if="value.token.symbol === 'wBAN'">({{ balance | banPrice }})</span>
+					<span v-if="value.token.symbol === 'wPAW'">({{ balance | pawPrice }})</span>
 				</q-item-label>
 			</q-item-section>
 		</q-item>
@@ -53,7 +53,7 @@
 import { Component, Prop, Ref, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
 import { BigNumber, ethers } from 'ethers'
-import { bnToStringFilter, banPriceFilter } from '@/utils/filters'
+import { bnToStringFilter, pawPriceFilter } from '@/utils/filters'
 import accounts from '@/store/modules/accounts'
 import { Network, Networks } from '@/utils/Networks'
 import TokenChooser from '@/components/tokens/TokenChooser.vue'
@@ -71,7 +71,7 @@ const accountsStore = namespace('accounts')
 	},
 	filters: {
 		bnToStringFilter,
-		banPriceFilter,
+		pawPriceFilter,
 	},
 })
 export default class TokenInput extends Vue {
@@ -94,7 +94,7 @@ export default class TokenInput extends Vue {
 	updateBalanceLoop!: any
 
 	get balanceFormatted(): string {
-		if (this.value.token.symbol === 'wBAN') {
+		if (this.value.token.symbol === 'wPAW') {
 			return Number.parseFloat(this.balance).toFixed(3)
 		} else {
 			return Number.parseFloat(this.balance).toFixed(8)
@@ -154,8 +154,8 @@ export default class TokenInput extends Vue {
 	}
 
 	async addTokenToMetaMask() {
-		if (this.value.token.symbol === 'wBAN') {
-			accounts.addWBANTokenToMetaMask()
+		if (this.value.token.symbol === 'wPAW') {
+			accounts.addWPAWTokenToMetaMask()
 		} else {
 			const { token } = this.value
 			MetaMask.addTokenToWallet(token.address, token.symbol, token.decimals, token.logoURI)

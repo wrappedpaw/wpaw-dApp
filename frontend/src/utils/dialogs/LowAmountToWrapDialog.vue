@@ -7,7 +7,7 @@
 			<q-card-section horizontal>
 				<q-card-section class="q-pt-xs">
 					<div class="text-white">
-						<p>You are requesting to wrap/unwrap a 🤏 amount of {{ amount }} BAN/wBAN.</p>
+						<p>You are requesting to wrap/unwrap a 🤏 amount of {{ amount }} PAW/wPAW.</p>
 						<p>{{ expectedBlockchain.chainName }} network fees may not be worth it for this wrap/unwrap.</p>
 					</div>
 				</q-card-section>

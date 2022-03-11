@@ -1,6 +1,6 @@
 <template>
 	<div class="about">
-		<h1 class="text-center">wBAN - Wrap your BAN on {{ expectedBlockchain.network }}</h1>
+		<h1 class="text-center">wPAW - Wrap your PAW on {{ expectedBlockchain.network }}</h1>
 	</div>
 </template>
 

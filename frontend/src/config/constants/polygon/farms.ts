@@ -4,13 +4,13 @@ import { FarmConfig } from '../types'
 const farms: FarmConfig[] = [
 	{
 		pid: 0,
-		lpSymbol: 'wBAN-WETH',
+		lpSymbol: 'wPAW-WETH',
 		lpAddresses: {
 			dev: '',
 			staging: '',
 			production: '0xb556feD3B348634a9A010374C406824Ae93F0CF8',
 		},
-		token: tokens.wban,
+		token: tokens.wpaw,
 		quoteToken: tokens.weth,
 		endTime: {
 			dev: 0,

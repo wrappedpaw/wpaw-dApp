@@ -8,11 +8,11 @@ import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 
 /**
- * wBAN token with mints and burns controlled by the bridge.
+ * wPAW token with mints and burns controlled by the bridge.
  *
  * @author Wrap That Potassium <wrap-that-potassium@protonmail.com>
  */
-contract WBANToken is ERC20PausableUpgradeable, AccessControlUpgradeable, OwnableUpgradeable {
+contract WPAWToken is ERC20PausableUpgradeable, AccessControlUpgradeable, OwnableUpgradeable {
     using SafeMathUpgradeable for uint256;
 
     mapping(bytes32 => bool) private _receipts;
@@ -22,7 +22,7 @@ contract WBANToken is ERC20PausableUpgradeable, AccessControlUpgradeable, Ownabl
 
     function initialize() public initializer {
         __Ownable_init();
-        __ERC20_init('Wrapped Banano', 'wBAN');
+        __ERC20_init('Wrapped Paw', 'wPAW');
         __AccessControl_init();
         // setup roles
         _setupRole(MINTER_ROLE, owner());
@@ -52,7 +52,7 @@ contract WBANToken is ERC20PausableUpgradeable, AccessControlUpgradeable, Ownabl
     }
 
     /**
-     * Check if a receipt is already claimed/consumed, meaning the associated wBAN were minted.
+     * Check if a receipt is already claimed/consumed, meaning the associated wPAW were minted.
      *
      * @dev this code checks for both old and new signatures, using/forgetting the `chainId`
      */
@@ -72,12 +72,12 @@ contract WBANToken is ERC20PausableUpgradeable, AccessControlUpgradeable, Ownabl
         return _receipts[hash] || _receipts[oldHash];
     }
 
-    function swapToBan(string memory bananoAddress, uint256 amount) external {
+    function swapToPaw(string memory pawAddress, uint256 amount) external {
         require(!paused(), 'BEP20Pausable: transfer paused');
-        require(balanceOf(_msgSender()) >= amount, 'Insufficient wBAN');
-        require(bytes(bananoAddress).length == 64, 'Not a Banano address');
+        require(balanceOf(_msgSender()) >= amount, 'Insufficient wPAW');
+        require(bytes(pawAddress).length == 64, 'Not a Paw address');
         _burn(_msgSender(), amount);
-        emit SwapToBan(_msgSender(), bananoAddress, amount);
+        emit SwapToPaw(_msgSender(), pawAddress, amount);
     }
 
     function pause() external whenNotPaused onlyRole(PAUSER_ROLE) {
@@ -116,7 +116,7 @@ contract WBANToken is ERC20PausableUpgradeable, AccessControlUpgradeable, Ownabl
     }
 
     /**
-     * @dev Emitted when a swap is done for `amount` wBAN from `from` to Banano address `ban_address`
+     * @dev Emitted when a swap is done for `amount` wPAW from `from` to Paw address `paw_address`
      */
-    event SwapToBan(address indexed from, string banAddress, uint256 amount);
+    event SwapToPaw(address indexed from, string pawAddress, uint256 amount);
 }

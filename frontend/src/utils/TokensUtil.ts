@@ -15,11 +15,11 @@ class TokensUtil {
 	static ENV_NAME: string = process.env.VUE_APP_ENV_NAME || ''
 	static BLOCKCHAIN: string = process.env.VUE_APP_BLOCKCHAIN || ''
 
-	static getWBANAddress(): string {
-		if (tokens && tokens.wban && tokens.wban.address) {
-			return tokens.wban.address[TokensUtil.ENV_NAME as keyof Address]
+	static getWPAWAddress(): string {
+		if (tokens && tokens.wpaw && tokens.wpaw.address) {
+			return tokens.wpaw.address[TokensUtil.ENV_NAME as keyof Address]
 		} else {
-			throw new Error(`Can't find wBAN token in environment ${TokensUtil.ENV_NAME}`)
+			throw new Error(`Can't find wPAW token in environment ${TokensUtil.ENV_NAME}`)
 		}
 	}
 
@@ -30,7 +30,7 @@ class TokensUtil {
 		}
 		TokensUtil.initialized = true
 		console.info('Initializing tokens database')
-		const db: IDBPDatabase = await openDB('wBAN', 1, {
+		const db: IDBPDatabase = await openDB('wPAW', 1, {
 			upgrade(db) {
 				console.debug('in IndexDB database upgrade')
 				if (!db.objectStoreNames.contains(TOKENS_STORE_NAME)) {
@@ -44,25 +44,25 @@ class TokensUtil {
 			const token = tokens[i]
 			await db.put(TOKENS_STORE_NAME, token, token.address.toLowerCase())
 		}
-		// check if wBAN is whitelisted
-		const wban = tokens.find((token) => token.symbol === 'wBAN')
+		// check if wPAW is whitelisted
+		const wpaw = tokens.find((token) => token.symbol === 'wPAW')
 		// add it
-		if (!wban) {
-			const wbanAddress = TokensUtil.getWBANAddress()
-			const logo = await import(`../assets/wban-logo-${TokensUtil.BLOCKCHAIN}.svg`)
+		if (!wpaw) {
+			const wpawAddress = TokensUtil.getWPAWAddress()
+			const logo = await import(`../assets/wpaw-logo-${TokensUtil.BLOCKCHAIN}.svg`)
 			const logoUrl = `${window.location.origin}${logo.default}`
-			console.warn(`wBAN is not whitelisted in the DEX. Adding it at ${wbanAddress}`)
+			console.warn(`wPAW is not whitelisted in the DEX. Adding it at ${wpawAddress}`)
 			await db.put(
 				TOKENS_STORE_NAME,
 				{
-					name: 'Wrapped Banano',
-					symbol: 'wBAN',
-					address: wbanAddress,
+					name: 'Wrapped Paw',
+					symbol: 'wPAW',
+					address: wpawAddress,
 					decimals: 18,
 					logoURI: logoUrl,
 					chainId: Networks.EXPECTED_CHAIN_ID,
 				},
-				TokensUtil.getWBANAddress().toLowerCase()
+				TokensUtil.getWPAWAddress().toLowerCase()
 			)
 		}
 		db.close()
@@ -73,7 +73,7 @@ class TokensUtil {
 			await TokensUtil.loadTokensList()
 		}
 		console.info(`Searching for token "${address.toLowerCase()}"`)
-		const db: IDBPDatabase = await openDB('wBAN')
+		const db: IDBPDatabase = await openDB('wPAW')
 		const token = db.get(TOKENS_STORE_NAME, address.toLowerCase())
 		db.close()
 		return token
@@ -84,7 +84,7 @@ class TokensUtil {
 			await TokensUtil.loadTokensList()
 		}
 		console.info(`Searching for token "${symbol.toLowerCase()}"`)
-		const db: IDBPDatabase = await openDB('wBAN')
+		const db: IDBPDatabase = await openDB('wPAW')
 		const token = await db.getFromIndex(TOKENS_STORE_NAME, 'symbol', symbol)
 		db.close()
 		return token
@@ -99,7 +99,7 @@ class TokensUtil {
 		if (!TokensUtil.initialized) {
 			await TokensUtil.loadTokensList()
 		}
-		const db: IDBPDatabase = await openDB('wBAN')
+		const db: IDBPDatabase = await openDB('wPAW')
 		const tokens: Array<Token> = (await db.getAll(TOKENS_STORE_NAME))
 			// sort by alphabetical order
 			.sort((a: Token, b: Token) =>

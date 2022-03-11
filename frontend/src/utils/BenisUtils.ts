@@ -12,14 +12,14 @@ class BenisUtils {
 	/**
 	 * Get farm APR value in %
 	 * @param pid the pool ID
-	 * @param wbanPriceUsd wBAN price in USD
+	 * @param wpawPriceUsd wPAW price in USD
 	 * @param poolLiquidityUsd Total pool liquidity in USD
 	 * @returns
 	 */
 	public async getFarmAPR(
 		pid: number,
 		envName: string,
-		wbanPriceUsd: BigNumber,
+		wpawPriceUsd: BigNumber,
 		poolLiquidityUsd: BigNumber,
 		benis: Benis
 	): Promise<number> {
@@ -29,11 +29,11 @@ class BenisUtils {
 		if (this.getFarmDurationLeft(pid, envName) === 'Finished') {
 			return 0
 		}
-		const wbanPerSecond = await benis.wbanPerSecond()
-		const wbanPerYear = wbanPerSecond.mul(ONE_YEAR)
+		const wpawPerSecond = await benis.wpawPerSecond()
+		const wpawPerYear = wpawPerSecond.mul(ONE_YEAR)
 		const pool = await benis.poolInfo(pid)
-		const poolRewardsPerYear = wbanPerYear.mul(pool.allocPoint).div(await benis.totalAllocPoint())
-		const apr = poolRewardsPerYear.mul(wbanPriceUsd).div(poolLiquidityUsd).mul(100).div(ONE_UNIT)
+		const poolRewardsPerYear = wpawPerYear.mul(pool.allocPoint).div(await benis.totalAllocPoint())
+		const apr = poolRewardsPerYear.mul(wpawPriceUsd).div(poolLiquidityUsd).mul(100).div(ONE_UNIT)
 		return apr.toNumber()
 	}
 
@@ -77,7 +77,7 @@ class BenisUtils {
 	}
 
 	public async getPendingRewards(pid: number, account: string, benis: Benis): Promise<BigNumber> {
-		return benis.pendingWBAN(pid, account)
+		return benis.pendingWPAW(pid, account)
 	}
 
 	private getEndTime(pid: number, environment: string): number {

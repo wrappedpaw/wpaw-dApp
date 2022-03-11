@@ -7,9 +7,9 @@ class Dialogs {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private static withdrawalDialog: any
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	private static swapToWBanDialog: any
+	private static swapToWPawDialog: any
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	private static swapToBanDialog: any
+	private static swapToPawDialog: any
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private static swapFarmSupplyDialog: any
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,8 +21,8 @@ class Dialogs {
 		const dismiss = Notify.create({
 			type: 'positive',
 			html: true,
-			message: `Your deposit of ${deposit} BAN was received.`,
-			caption: 'You can swap it to wBAN.',
+			message: `Your deposit of ${deposit} PAW was received.`,
+			caption: 'You can swap it to wPAW.',
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -39,7 +39,7 @@ class Dialogs {
 		const dismiss = Notify.create({
 			type: 'warning',
 			html: true,
-			message: `Your deposit of ${deposit} BAN was rejected.`,
+			message: `Your deposit of ${deposit} PAW was rejected.`,
 			caption: "Make sure you don't send amounts with more than 2 decimals or with raw values",
 			timeout: 0,
 			actions: [
@@ -67,7 +67,7 @@ class Dialogs {
 	static showWithdrawalAsPending(withdrawal: number): void {
 		Dialogs.withdrawalDialog.update({
 			title: 'Pending Withdrawal',
-			message: `Your withdrawal of ${withdrawal} BAN can't be processed right now.<br /><br /><strong>It has been put in a pending list and will be processed later!</strong><br /><br />Meanwhile your deposited BAN balance won't be reduced from this withdrawal.`,
+			message: `Your withdrawal of ${withdrawal} PAW can't be processed right now.<br /><br /><strong>It has been put in a pending list and will be processed later!</strong><br /><br />Meanwhile your deposited PAW balance won't be reduced from this withdrawal.`,
 			progress: false,
 			ok: {
 				color: 'primary',
@@ -82,8 +82,8 @@ class Dialogs {
 		const dismiss = Notify.create({
 			type: 'positive',
 			html: true,
-			message: `${withdrawal} BAN were sent back to your wallet.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			message: `${withdrawal} PAW were sent back to your wallet.`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -92,7 +92,7 @@ class Dialogs {
 					color: 'white',
 					noDismiss: true,
 					handler: () => {
-						openURL(`https://creeper.banano.cc/explorer/block/${txnHash}`)
+						openURL(`https://tracker.paw.digital/block/${txnHash}`)
 					},
 				},
 				{
@@ -112,8 +112,8 @@ class Dialogs {
 		const dismiss = Notify.create({
 			type: 'warning',
 			html: true,
-			message: `Your withdrawal of ${withdrawal} BAN is in pending state.`,
-			caption: 'As soon as wBAN hot wallet is refilled from its cold wallet your withdrawal will be done!',
+			message: `Your withdrawal of ${withdrawal} PAW is in pending state.`,
+			caption: 'As soon as wPAW hot wallet is refilled from its cold wallet your withdrawal will be done!',
 			timeout: 0,
 			actions: [
 				{
@@ -129,10 +129,10 @@ class Dialogs {
 		}
 	}
 
-	static startSwapToWBan(amount: string): void {
-		Dialogs.swapToWBanDialog = Dialog.create({
+	static startSwapToWPaw(amount: string): void {
+		Dialogs.swapToWPawDialog = Dialog.create({
 			dark: true,
-			title: `Swap of ${amount} BAN in progress...`,
+			title: `Swap of ${amount} PAW in progress...`,
 			message: 'Working hard to process your swap request!',
 			progress: true,
 			persistent: true,
@@ -141,12 +141,12 @@ class Dialogs {
 		})
 	}
 
-	static confirmSwapToWBan(deposit: string, txnHash: string, txnLink: string): void {
+	static confirmSwapToWPaw(deposit: string, txnHash: string, txnLink: string): void {
 		const dismiss = Notify.create({
 			type: 'positive',
 			html: true,
-			message: `Your swap of ${deposit} BAN was processed succesfully.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			message: `Your swap of ${deposit} PAW was processed succesfully.`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -165,17 +165,17 @@ class Dialogs {
 				},
 			],
 		})
-		if (Dialogs.swapToWBanDialog) {
-			Dialogs.swapToWBanDialog.hide()
-			Dialogs.swapToWBanDialog = null
+		if (Dialogs.swapToWPawDialog) {
+			Dialogs.swapToWPawDialog.hide()
+			Dialogs.swapToWPawDialog = null
 		}
 	}
 
-	static errorSwapToWBan(deposit: string): void {
+	static errorSwapToWPaw(deposit: string): void {
 		const dismiss = Notify.create({
 			type: 'negative',
 			html: true,
-			message: `Your swap of ${deposit} BAN couldn't be processed.`,
+			message: `Your swap of ${deposit} PAW couldn't be processed.`,
 			caption: `Go to the history page and click on the claim button associated to the wrap request.`,
 			timeout: 0,
 			actions: [
@@ -186,16 +186,16 @@ class Dialogs {
 				},
 			],
 		})
-		if (Dialogs.swapToWBanDialog) {
-			Dialogs.swapToWBanDialog.hide()
-			Dialogs.swapToWBanDialog = null
+		if (Dialogs.swapToWPawDialog) {
+			Dialogs.swapToWPawDialog.hide()
+			Dialogs.swapToWPawDialog = null
 		}
 	}
 
-	static startSwapToBan(amount: string): void {
-		Dialogs.swapToBanDialog = Dialog.create({
+	static startSwapToPaw(amount: string): void {
+		Dialogs.swapToPawDialog = Dialog.create({
 			dark: true,
-			title: `Swap of ${amount} wBAN in progress...`,
+			title: `Swap of ${amount} wPAW in progress...`,
 			message: 'Working hard to process your swap request!',
 			progress: true,
 			persistent: true,
@@ -204,12 +204,12 @@ class Dialogs {
 		})
 	}
 
-	static confirmSwapToBan(deposit: string): void {
+	static confirmSwapToPaw(deposit: string): void {
 		const dismiss = Notify.create({
 			type: 'positive',
 			html: true,
-			message: `Your swap of ${deposit} wBAN was processed succesfully.`,
-			caption: 'Your balance of deposited Banano has been updated.',
+			message: `Your swap of ${deposit} wPAW was processed succesfully.`,
+			caption: 'Your balance of deposited Paw has been updated.',
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -220,9 +220,9 @@ class Dialogs {
 				},
 			],
 		})
-		if (Dialogs.swapToBanDialog) {
-			Dialogs.swapToBanDialog.hide()
-			Dialogs.swapToBanDialog = null
+		if (Dialogs.swapToPawDialog) {
+			Dialogs.swapToPawDialog.hide()
+			Dialogs.swapToPawDialog = null
 		}
 	}
 
@@ -243,7 +243,7 @@ class Dialogs {
 			type: 'positive',
 			html: true,
 			message: `Your supply of ${amount} ${symbol} was processed succesfully.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [
@@ -285,7 +285,7 @@ class Dialogs {
 			type: 'positive',
 			html: true,
 			message: `Your withdrawal of ${amount} ${symbol} was processed succesfully.`,
-			caption: `Txn: <span class="banano-transaction-hash">${txnHash}</span>`,
+			caption: `Txn: <span class="paw-transaction-hash">${txnHash}</span>`,
 			timeout: Dialogs.TIMEOUT,
 			progress: true,
 			actions: [

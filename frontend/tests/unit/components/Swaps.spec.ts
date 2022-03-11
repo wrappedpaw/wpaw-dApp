@@ -34,7 +34,7 @@ describe("Swaps", () => {
 		})
 	})
 
-  it('should display by default a swap wBAN->USDC', async () => {
+  it('should display by default a swap wPAW->USDC', async () => {
 		const wrapper: Wrapper<Swaps> = factory()
 		await sleep(1_000)
 		expect(wrapper.is(Swaps)).toBeTruthy()
@@ -43,13 +43,13 @@ describe("Swaps", () => {
 		const to = wrapper.findComponent({ ref: 'to' })
 		expect(from).toBeTruthy()
 		expect(to).toBeTruthy()
-		// expect a wBAN balance with 0 decimals
-		expect(from.text()).toContain('Balance: 0.000 wBAN')
+		// expect a wPAW balance with 0 decimals
+		expect(from.text()).toContain('Balance: 0.000 wPAW')
 		// expect a WETH balance with 8 decimals
 		expect(to.text()).toContain('Balance: 0.00000000 USDC')
 		// expect empty input amount
 		expect(wrapper.vm.$data.from.amount).toBe('')
-		expect(wrapper.vm.$data.from.token.symbol).toBe('wBAN')
+		expect(wrapper.vm.$data.from.token.symbol).toBe('wPAW')
 		// expect an empty string for estimated fee
 		//expect(wrapper.vm.$data.estimatedFee).toBe('')
 		// expect swap button to be disabled

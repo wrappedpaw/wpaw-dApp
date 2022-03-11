@@ -85,7 +85,7 @@ export default class FarmsPage extends Vue {
 
 	userHasDepositsInEndedFarms = false
 
-	wbanAddress: string = TokensUtil.getWBANAddress()
+	wpawAddress: string = TokensUtil.getWPAWAddress()
 
 	benisUtils = new BenisUtils()
 

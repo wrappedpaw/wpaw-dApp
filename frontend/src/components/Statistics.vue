@@ -1,7 +1,7 @@
 <template>
 	<q-card class="statistics-card">
 		<q-card-section>
-			<div class="text-h6">wBAN Statistics</div>
+			<div class="text-h6">wPAW Statistics</div>
 			<div class="text-subtitle2">by Benis</div>
 		</q-card-section>
 		<q-card-section>
@@ -9,11 +9,11 @@
 				<strong>
 					Total Supply
 					<q-icon name="info" class="dictionary vertical-top">
-						<q-tooltip>Number of wBAN that have been created from associated BAN deposits</q-tooltip>
+						<q-tooltip>Number of wPAW that have been created from associated PAW deposits</q-tooltip>
 					</q-icon>
 					:
 				</strong>
-				{{ totalSupply | bnToHumanString }} wBAN ({{ totalSupply | bnToString | banPrice }})
+				{{ totalSupply | bnToHumanString }} wPAW ({{ totalSupply | bnToString | pawPrice }})
 			</p>
 		</q-card-section>
 	</q-card>
@@ -22,7 +22,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from 'vuex-class'
-import { bnToStringFilter, banPriceFilter } from '@/utils/filters'
+import { bnToStringFilter, pawPriceFilter } from '@/utils/filters'
 import { BigNumber } from 'ethers'
 
 const contractsStore = namespace('contracts')
@@ -30,7 +30,7 @@ const contractsStore = namespace('contracts')
 @Component({
 	filters: {
 		bnToStringFilter,
-		banPriceFilter,
+		pawPriceFilter,
 	},
 })
 export default class Statistics extends Vue {

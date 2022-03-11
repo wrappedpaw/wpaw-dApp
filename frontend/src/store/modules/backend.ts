@@ -21,8 +21,8 @@ import { HistoryRequest } from '@/models/HistoryRequest'
 })
 class BackendModule extends VuexModule {
 	private _online = false
-	private _banWalletForDeposits = ''
-	private _banDeposited: BigNumber = BigNumber.from(0)
+	private _pawWalletForDeposits = ''
+	private _pawDeposited: BigNumber = BigNumber.from(0)
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private _deposits: Array<any> = []
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,16 +39,16 @@ class BackendModule extends VuexModule {
 		return this._online
 	}
 
-	get banWalletForDeposits() {
-		return this._banWalletForDeposits
+	get pawWalletForDeposits() {
+		return this._pawWalletForDeposits
 	}
 
-	get banWalletForDepositsLink() {
-		return `ban:${this._banWalletForDeposits}`
+	get pawWalletForDepositsLink() {
+		return `paw:${this._pawWalletForDeposits}`
 	}
 
-	get banDeposited() {
-		return this._banDeposited
+	get pawDeposited() {
+		return this._pawDeposited
 	}
 
 	get deposits() {
@@ -81,13 +81,13 @@ class BackendModule extends VuexModule {
 	}
 
 	@Mutation
-	setBanWalletForDeposits(address: string) {
-		this._banWalletForDeposits = address
+	setPawWalletForDeposits(address: string) {
+		this._pawWalletForDeposits = address
 	}
 
 	@Mutation
-	setBanDeposited(balance: BigNumber) {
-		this._banDeposited = balance
+	setPawDeposited(balance: BigNumber) {
+		this._pawDeposited = balance
 	}
 
 	@Mutation
@@ -129,96 +129,96 @@ class BackendModule extends VuexModule {
 	}
 
 	@Action
-	async initBackend(banWallet: string) {
+	async initBackend(pawWallet: string) {
 		console.log(`in initBackend`)
 		try {
 			const healthResponse = await axios.request({ url: `${BackendModule.BACKEND_URL}/health` })
 			const healthStatus = healthResponse.data.status
 			this.context.commit('setOnline', healthStatus === 'OK')
 
-			if (!this._streamEventsSource && banWallet) {
-				console.debug(`Initiating connection to streams endpoint for ${banWallet}`)
+			if (!this._streamEventsSource && pawWallet) {
+				console.debug(`Initiating connection to streams endpoint for ${pawWallet}`)
 				/* eslint-disable @typescript-eslint/no-explicit-any */
-				const eventSource: EventSource = new EventSource(`${BackendModule.BACKEND_URL}/events/${banWallet}`)
+				const eventSource: EventSource = new EventSource(`${BackendModule.BACKEND_URL}/events/${pawWallet}`)
 				const withdrawalEvent = (e: any) => {
 					console.debug(e)
-					const { banWallet, withdrawal, balance, transaction } = JSON.parse(e.data)
+					const { pawWallet, withdrawal, balance, transaction } = JSON.parse(e.data)
 					if (transaction) {
 						console.log(
-							`Received banano withdrawal event. Wallet "${banWallet}" withdrew ${withdrawal} BAN. Balance is: ${balance} BAN.`
+							`Received paw withdrawal event. Wallet "${pawWallet}" withdrew ${withdrawal} PAW. Balance is: ${balance} PAW.`
 						)
-						this.context.commit('setBanDeposited', ethers.utils.parseEther(balance))
-						if (Contracts.wbanContract && Accounts.activeAccount) {
-							Contracts.reloadWBANBalance({
-								contract: Contracts.wbanContract,
+						this.context.commit('setPawDeposited', ethers.utils.parseEther(balance))
+						if (Contracts.wpawContract && Accounts.activeAccount) {
+							Contracts.reloadWPAWBalance({
+								contract: Contracts.wpawContract,
 								account: Accounts.activeAccount,
 							})
 						}
 						Dialogs.showWithdrawalSuccess(withdrawal, transaction)
 					} else {
 						console.log(
-							`Received banano pending withdrawal event. Wallet "${banWallet}" withdrew ${withdrawal} BAN but this is put in a pending list`
+							`Received paw pending withdrawal event. Wallet "${pawWallet}" withdrew ${withdrawal} PAW but this is put in a pending list`
 						)
 						Dialogs.showPendingWithdrawal(withdrawal)
 					}
 				}
 
-				eventSource.addEventListener('banano-deposit', (e: any) => {
+				eventSource.addEventListener('paw-deposit', (e: any) => {
 					console.debug(e.data)
-					const { banWallet, deposit, balance, rejected } = JSON.parse(e.data)
+					const { pawWallet, deposit, balance, rejected } = JSON.parse(e.data)
 					if (rejected) {
-						console.log(`Received ${deposit} BAN which were sent back.`)
+						console.log(`Received ${deposit} PAW which were sent back.`)
 						Dialogs.declineUserDeposit(deposit)
 					} else {
 						console.log(
-							`Received banano deposit event. Wallet "${banWallet}" deposited ${deposit} BAN. Balance is: ${balance} BAN.`
+							`Received paw deposit event. Wallet "${pawWallet}" deposited ${deposit} PAW. Balance is: ${balance} PAW.`
 						)
-						this.context.commit('setBanDeposited', ethers.utils.parseEther(balance))
+						this.context.commit('setPawDeposited', ethers.utils.parseEther(balance))
 						Dialogs.confirmUserDeposit(deposit)
 					}
 				})
-				eventSource.addEventListener('banano-withdrawal', withdrawalEvent)
+				eventSource.addEventListener('paw-withdrawal', withdrawalEvent)
 				eventSource.addEventListener('pending-withdrawal', withdrawalEvent)
-				eventSource.addEventListener('swap-ban-to-wban', async (e: any) => {
-					const { banWallet, blockchainWallet, swapped, receipt, uuid, balance, wbanBalance } = JSON.parse(e.data)
-					console.info(`Received swap BAN to wBAN event. Wallet "${banWallet}" swapped ${swapped} BAN to WBAN.`)
+				eventSource.addEventListener('swap-paw-to-wpaw', async (e: any) => {
+					const { pawWallet, blockchainWallet, swapped, receipt, uuid, balance, wpawBalance } = JSON.parse(e.data)
+					console.info(`Received swap PAW to wPAW event. Wallet "${pawWallet}" swapped ${swapped} PAW to WPAW.`)
 					console.info(`Receipt is "${receipt}".`)
-					console.info(`Balance is: ${balance} BAN, ${wbanBalance} wBAN.`)
+					console.info(`Balance is: ${balance} PAW, ${wpawBalance} wPAW.`)
 					const signature: Signature = ethers.utils.splitSignature(receipt)
 					console.log(`Signature is ${JSON.stringify(signature)}`)
-					if (Contracts.wbanContract && Accounts.activeAccount) {
+					if (Contracts.wpawContract && Accounts.activeAccount) {
 						try {
 							const txnHash = await Contracts.mint({
 								amount: ethers.utils.parseEther(swapped.toString()),
 								blockchainWallet,
 								receipt,
 								uuid,
-								contract: Contracts.wbanContract,
+								contract: Contracts.wpawContract,
 							})
-							this.context.commit('setBanDeposited', ethers.utils.parseEther(balance))
-							Contracts.reloadWBANBalance({
+							this.context.commit('setPawDeposited', ethers.utils.parseEther(balance))
+							Contracts.reloadWPAWBalance({
 								account: blockchainWallet,
-								contract: Contracts.wbanContract,
+								contract: Contracts.wpawContract,
 							})
 							const blockchainExplorerUrl = Accounts.blockExplorerUrl
 							const txnLink = `${blockchainExplorerUrl}/tx/${txnHash}`
-							Dialogs.confirmSwapToWBan(swapped, txnHash, txnLink)
+							Dialogs.confirmSwapToWPaw(swapped, txnHash, txnLink)
 						} catch (err) {
 							console.error(err)
-							Dialogs.errorSwapToWBan(swapped)
+							Dialogs.errorSwapToWPaw(swapped)
 						}
 					} else {
 						console.error("Can't make the call to the smart-contract to mint")
 					}
 				})
-				eventSource.addEventListener('swap-wban-to-ban', async (e: any) => {
-					const { banWallet, swapped, balance, wbanBalance } = JSON.parse(e.data)
+				eventSource.addEventListener('swap-wpaw-to-paw', async (e: any) => {
+					const { pawWallet, swapped, balance, wpawBalance } = JSON.parse(e.data)
 					console.log(
-						`Received swap wBAN to BAN event. Wallet "${banWallet}" swapped ${swapped} wBAN to BAN. Balance is: ${balance} BAN, ${wbanBalance} wBAN.`
+						`Received swap wPAW to PAW event. Wallet "${pawWallet}" swapped ${swapped} wPAW to PAW. Balance is: ${balance} PAW, ${wpawBalance} wPAW.`
 					)
-					this.context.commit('setBanDeposited', ethers.utils.parseEther(balance))
-					Contracts.updateWBanBalance(ethers.utils.parseEther(wbanBalance))
-					Dialogs.confirmSwapToBan(swapped)
+					this.context.commit('setPawDeposited', ethers.utils.parseEther(balance))
+					Contracts.updateWPawBalance(ethers.utils.parseEther(wpawBalance))
+					Dialogs.confirmSwapToPaw(swapped)
 				})
 				eventSource.addEventListener('ping', () => console.debug('Ping received from the server'))
 				eventSource.addEventListener('message', (e: any) => {
@@ -237,15 +237,15 @@ class BackendModule extends VuexModule {
 				this.context.commit('setStreamEventsSource', eventSource)
 			}
 
-			const depositWalletResponse = await axios.request({ url: `${BackendModule.BACKEND_URL}/deposits/ban/wallet` })
+			const depositWalletResponse = await axios.request({ url: `${BackendModule.BACKEND_URL}/deposits/paw/wallet` })
 			const depositWalletAddress = depositWalletResponse.data.address
-			this.context.commit('setBanWalletForDeposits', depositWalletAddress)
+			this.context.commit('setPawWalletForDeposits', depositWalletAddress)
 		} catch (err) {
 			console.error(err)
 			this.context.commit('setOnline', false)
 			this.context.commit(
 				'setErrorMessage',
-				'wBAN bridge is under maintenance. You can still use the farms while we work on this.'
+				'wPAW bridge is under maintenance. You can still use the farms while we work on this.'
 			)
 		}
 	}
@@ -260,29 +260,29 @@ class BackendModule extends VuexModule {
 	}
 
 	@Action
-	async loadBanDeposited(account: string) {
+	async loadPawDeposited(account: string) {
 		if (account) {
-			console.debug('in loadBanDeposited')
-			const resp = await axios.get(`${BackendModule.BACKEND_URL}/deposits/ban/${account}`)
+			console.debug('in loadPawDeposited')
+			const resp = await axios.get(`${BackendModule.BACKEND_URL}/deposits/paw/${account}`)
 			const { balance } = resp.data
-			this.context.commit('setBanDeposited', ethers.utils.parseEther(balance))
+			this.context.commit('setPawDeposited', ethers.utils.parseEther(balance))
 		} else {
-			console.error("Can't load BAN deposited as address is empty")
+			console.error("Can't load PAW deposited as address is empty")
 		}
 	}
 
 	@Action
 	async claimAddresses(claimRequest: ClaimRequest): Promise<ClaimResponse> {
-		const { banAddress, blockchainAddress, provider } = claimRequest
-		console.info(`About to claim ${banAddress} with ${blockchainAddress}`)
-		if (provider && banAddress && blockchainAddress) {
+		const { pawAddress, blockchainAddress, provider } = claimRequest
+		console.info(`About to claim ${pawAddress} with ${blockchainAddress}`)
+		if (provider && pawAddress && blockchainAddress) {
 			try {
 				const sig = await provider
 					.getSigner()
-					.signMessage(`I hereby claim that the BAN address "${banAddress}" is mine`)
+					.signMessage(`I hereby claim that the PAW address "${pawAddress}" is mine`)
 				// call the backend for the swap
 				const resp = await axios.post(`${BackendModule.BACKEND_URL}/claim`, {
-					banAddress,
+					pawAddress,
 					blockchainAddress,
 					sig,
 				})
@@ -307,7 +307,7 @@ class BackendModule extends VuexModule {
 						case 403:
 							this.context.commit(
 								'setErrorMessage',
-								`BAN address "${banAddress}" is blacklisted. Use another BAN address.`
+								`PAW address "${pawAddress}" is blacklisted. Use another PAW address.`
 							)
 							break
 						case 409:
@@ -328,21 +328,21 @@ class BackendModule extends VuexModule {
 
 	@Action
 	async swap(swapRequest: SwapRequest): Promise<SwapResponse> {
-		const { amount, banAddress, blockchainAddress, provider } = swapRequest
-		console.info(`Swap from BAN to wBAN requested for ${amount} BAN`)
+		const { amount, pawAddress, blockchainAddress, provider } = swapRequest
+		console.info(`Swap from PAW to wPAW requested for ${amount} PAW`)
 		if (provider && amount && blockchainAddress) {
 			const sig = await provider
 				.getSigner()
-				.signMessage(`Swap ${amount} BAN for wBAN with BAN I deposited from my wallet "${banAddress}"`)
+				.signMessage(`Swap ${amount} PAW for wPAW with PAW I deposited from my wallet "${pawAddress}"`)
 			// call the backend for the swap
 			try {
 				await axios.post(`${BackendModule.BACKEND_URL}/swap`, {
-					ban: banAddress,
+					paw: pawAddress,
 					blockchain: blockchainAddress,
 					amount: amount,
 					sig: sig,
 				})
-				Dialogs.startSwapToWBan(amount.toString())
+				Dialogs.startSwapToWPaw(amount.toString())
 			} catch (err) {
 				this.context.commit('setInError', true)
 				if (err.response) {
@@ -373,19 +373,19 @@ class BackendModule extends VuexModule {
 	}
 
 	@Action
-	async withdrawBAN(withdrawRequest: WithdrawRequest): Promise<WithdrawResponse> {
-		const { amount, banAddress, blockchainAddress, provider } = withdrawRequest
-		console.info(`Should withdraw ${amount} BAN to ${banAddress}...`)
+	async withdrawPAW(withdrawRequest: WithdrawRequest): Promise<WithdrawResponse> {
+		const { amount, pawAddress, blockchainAddress, provider } = withdrawRequest
+		console.info(`Should withdraw ${amount} PAW to ${pawAddress}...`)
 		if (provider && amount && blockchainAddress) {
 			if (amount <= 0) {
 				throw new Error('Invalid withdrawal amount')
 			}
-			const sig = await provider.getSigner().signMessage(`Withdraw ${amount} BAN to my wallet "${banAddress}"`)
+			const sig = await provider.getSigner().signMessage(`Withdraw ${amount} PAW to my wallet "${pawAddress}"`)
 			Dialogs.startWithdrawal()
 			// call the backend for the swap
 			try {
-				const resp = await axios.post(`${BackendModule.BACKEND_URL}/withdrawals/ban`, {
-					ban: banAddress,
+				const resp = await axios.post(`${BackendModule.BACKEND_URL}/withdrawals/paw`, {
+					paw: pawAddress,
 					blockchain: blockchainAddress,
 					amount: amount,
 					sig: sig,
@@ -428,20 +428,20 @@ class BackendModule extends VuexModule {
 
 	@Action
 	async getHistory(request: HistoryRequest) {
-		const { blockchainAddress, banAddress } = request
-		console.info(`About to fetch history for ${blockchainAddress} and ${banAddress}`)
-		if (banAddress && blockchainAddress) {
+		const { blockchainAddress, pawAddress } = request
+		console.info(`About to fetch history for ${blockchainAddress} and ${pawAddress}`)
+		if (pawAddress && blockchainAddress) {
 			try {
-				const resp = await axios.get(`${BackendModule.BACKEND_URL}/history/${blockchainAddress}/${banAddress}`)
+				const resp = await axios.get(`${BackendModule.BACKEND_URL}/history/${blockchainAddress}/${pawAddress}`)
 				const { deposits, withdrawals } = resp.data
 				const swaps = await Promise.all(
 					resp.data.swaps.map(async (swap: any) => {
-						if (swap.receipt && swap.uuid && Contracts.wbanContract) {
-							// swap.consumed = await Contracts.wbanContract.isReceiptConsumed(swap.receipt)
+						if (swap.receipt && swap.uuid && Contracts.wpawContract) {
+							// swap.consumed = await Contracts.wpawContract.isReceiptConsumed(swap.receipt)
 							console.debug(`Blockchain address: ${blockchainAddress}`)
 							console.debug(`Amount: ${swap.amount}`)
 							console.debug(`UUID: ${swap.uuid}`)
-							swap.consumed = await Contracts.wbanContract.isReceiptConsumed(
+							swap.consumed = await Contracts.wpawContract.isReceiptConsumed(
 								blockchainAddress,
 								BigNumber.from(swap.amount),
 								swap.uuid

@@ -32,7 +32,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import settings from '@/store/modules/settings'
 import router from '@/router'
 import accounts from '@/store/modules/accounts'
-import ban from '@/store/modules/ban'
+import paw from '@/store/modules/paw'
 
 @Component
 export default class SettingsMenu extends Vue {
@@ -53,7 +53,7 @@ export default class SettingsMenu extends Vue {
 
 	async disconnect() {
 		await accounts.disconnectWalletProvider()
-		await ban.setBanAccount('')
+		await paw.setPawAccount('')
 		router.push('/')
 	}
 }

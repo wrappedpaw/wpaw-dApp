@@ -37,29 +37,29 @@
 								:side="index % 2 === 0 ? 'left' : 'right'"
 							>
 								<div v-if="event.type === 'deposit'">
-									You made a deposit of {{ event.amount | bnToStringFilter }} BAN.<br />
+									You made a deposit of {{ event.amount | bnToStringFilter }} PAW.<br />
 									Transaction:
 									<a :href="event.link" class="hash" target="_blank">{{ event.hash | hash_trimmed }}</a>
 								</div>
 								<div v-if="event.type === 'withdrawal'">
-									You made a withdrawal of {{ event.amount | bnToStringFilter }} BAN.<br />
+									You made a withdrawal of {{ event.amount | bnToStringFilter }} PAW.<br />
 									Transaction:
 									<a :href="event.link" class="hash" target="_blank">{{ event.hash | hash_trimmed }}</a>
 								</div>
-								<div v-if="event.type === 'swap-to-wban'">
+								<div v-if="event.type === 'swap-to-wpaw'">
 									<p v-if="event.consumed == true">
-										You made a swap of {{ event.amount | bnToStringFilter }} BAN to wBAN.
+										You made a swap of {{ event.amount | bnToStringFilter }} PAW to wPAW.
 									</p>
 									<div v-if="event.consumed == false">
 										<p>
-											You asked for a swap of {{ event.amount | bnToStringFilter }} BAN to wBAN, but either you did not
+											You asked for a swap of {{ event.amount | bnToStringFilter }} PAW to wPAW, but either you did not
 											claim it or it did not work.
 										</p>
 										<q-btn @click="claim(event)" label="Claim" icon="restore" color="primary" text-color="secondary" />
 									</div>
 								</div>
-								<div v-if="event.type === 'swap-to-ban'">
-									You made a swap of {{ event.amount | bnToStringFilter }} wBAN to BAN.<br />
+								<div v-if="event.type === 'swap-to-paw'">
+									You made a swap of {{ event.amount | bnToStringFilter }} wPAW to PAW.<br />
 									Transaction:
 									<a :href="event.link" class="hash" target="_blank">{{ event.hash | hash_trimmed }}</a>
 								</div>
@@ -78,12 +78,12 @@ import { namespace } from 'vuex-class'
 import Statistics from '@/components/Statistics.vue'
 import backend from '@/store/modules/backend'
 import contracts from '@/store/modules/contracts'
-import { SwapToWBanRequest } from '@/models/SwapToWBanRequest'
-import { bnToStringFilter, banPriceFilter, timestampFilter, hashTrimmedFilter } from '@/utils/filters'
+import { SwapToWPawRequest } from '@/models/SwapToWPawRequest'
+import { bnToStringFilter, pawPriceFilter, timestampFilter, hashTrimmedFilter } from '@/utils/filters'
 import { BigNumber } from 'ethers'
 
 const accountsStore = namespace('accounts')
-const banStore = namespace('ban')
+const pawStore = namespace('paw')
 const backendStore = namespace('backend')
 
 @Component({
@@ -92,7 +92,7 @@ const backendStore = namespace('backend')
 	},
 	filters: {
 		bnToStringFilter,
-		banPriceFilter,
+		pawPriceFilter,
 		timestampFilter,
 		hashTrimmedFilter,
 	},
@@ -104,8 +104,8 @@ export default class HistoryPage extends Vue {
 	@accountsStore.State('activeAccount')
 	activeAccount!: string
 
-	@banStore.Getter('banAddress')
-	banAddress!: string
+	@pawStore.Getter('pawAddress')
+	pawAddress!: string
 
 	@backendStore.Getter('deposits')
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,10 +139,10 @@ export default class HistoryPage extends Vue {
 				return 'Deposit'
 			case 'withdrawal':
 				return 'Withdrawal'
-			case 'swap-to-wban':
-				return 'Swap BAN -> wBAN'
-			case 'swap-to-ban':
-				return 'Swap wBAN -> BAN'
+			case 'swap-to-wpaw':
+				return 'Swap PAW -> wPAW'
+			case 'swap-to-paw':
+				return 'Swap wPAW -> PAW'
 			default:
 				return '??'
 		}
@@ -155,9 +155,9 @@ export default class HistoryPage extends Vue {
 				return 'file_download'
 			case 'withdrawal':
 				return 'file_upload'
-			case 'swap-to-wban':
+			case 'swap-to-wpaw':
 				return event.consumed ? 'done_all' : 'warning'
-			case 'swap-to-ban':
+			case 'swap-to-paw':
 				return 'done'
 			default:
 				return 'report'
@@ -167,7 +167,7 @@ export default class HistoryPage extends Vue {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	eventColor(event: any) {
 		switch (event.type) {
-			case 'swap-to-wban':
+			case 'swap-to-wpaw':
 				return event.consumed ? 'primary' : 'negative'
 			default:
 				return 'primary'
@@ -176,14 +176,14 @@ export default class HistoryPage extends Vue {
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	async claim(event: any) {
-		if (contracts.wbanContract) {
+		if (contracts.wpawContract) {
 			console.debug(`Amount: ${event.amount}`)
-			const swapRequest: SwapToWBanRequest = {
+			const swapRequest: SwapToWPawRequest = {
 				amount: BigNumber.from(event.amount),
 				blockchainWallet: this.activeAccount,
 				receipt: event.receipt,
 				uuid: event.uuid,
-				contract: contracts.wbanContract,
+				contract: contracts.wpawContract,
 			}
 			await contracts.claim(swapRequest)
 			await this.loadHistory()
@@ -193,7 +193,7 @@ export default class HistoryPage extends Vue {
 	async loadHistory() {
 		backend.getHistory({
 			blockchainAddress: this.activeAccount,
-			banAddress: this.banAddress,
+			pawAddress: this.pawAddress,
 		})
 	}
 

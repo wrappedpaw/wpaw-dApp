@@ -6,7 +6,7 @@
 			</q-item-section>
 			<q-item-section class="col-8 text-right">
 				<q-item-label>
-					Balance: {{ balance | bnToString }} {{ currency }} ({{ balance | bnToString | banPrice }})
+					Balance: {{ balance | bnToString }} {{ currency }} ({{ balance | bnToString | pawPrice }})
 				</q-item-label>
 			</q-item-section>
 		</q-item>
@@ -27,9 +27,9 @@
 				</template>
 			</q-input>
 		</q-card-section>
-		<q-card-actions vertical align="right" v-if="currency === 'wBAN'">
-			<a id="add-wban-to-metamask" @click="addWBANToMetaMask">
-				Add wBAN to MetaMask
+		<q-card-actions vertical align="right" v-if="currency === 'wPAW'">
+			<a id="add-wpaw-to-metamask" @click="addWPAWToMetaMask">
+				Add wPAW to MetaMask
 				<q-icon name="img:metamask.svg" size="24px" />
 			</a>
 		</q-card-actions>
@@ -39,14 +39,14 @@
 <script lang="ts">
 import { Component, Prop, PropSync, Ref, Vue } from 'vue-property-decorator'
 import { BigNumber, ethers } from 'ethers'
-import { bnToStringFilter, banPriceFilter } from '@/utils/filters'
+import { bnToStringFilter, pawPriceFilter } from '@/utils/filters'
 import accounts from '@/store/modules/accounts'
 import { Network, Networks } from '@/utils/Networks'
 
 @Component({
 	filters: {
 		bnToStringFilter,
-		banPriceFilter,
+		pawPriceFilter,
 	},
 })
 export default class SwapCurrencyInput extends Vue {
@@ -67,10 +67,10 @@ export default class SwapCurrencyInput extends Vue {
 	]
 
 	get logoUrl() {
-		if (this.currency === 'BAN') {
-			return 'ban-logo.png'
+		if (this.currency === 'PAW') {
+			return 'paw-logo.png'
 		} else {
-			return `wban-logo-${this.expectedBlockchain.network}.svg`
+			return `wpaw-logo-${this.expectedBlockchain.network}.svg`
 		}
 	}
 
@@ -100,8 +100,8 @@ export default class SwapCurrencyInput extends Vue {
 		}
 	}
 
-	addWBANToMetaMask() {
-		accounts.addWBANTokenToMetaMask()
+	addWPAWToMetaMask() {
+		accounts.addWPAWTokenToMetaMask()
 	}
 
 	emitEvent(event: string) {
@@ -132,7 +132,7 @@ body.body--light .bg-token-chooser
 	background-color: lighten($secondary, 75%) !important
 body.body--dark .bg-token-chooser
 	background-color: lighten($secondary, 10%) !important
-body.body--dark #add-wban-to-metamask
+body.body--dark #add-wpaw-to-metamask
 	color: $primary
 	cursor: pointer
 	font-size: .8em
