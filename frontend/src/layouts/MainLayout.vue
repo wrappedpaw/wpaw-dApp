@@ -26,26 +26,6 @@
 				>
 					<q-tooltip>{{ activeAccount }}</q-tooltip>
 				</q-btn>
-				<q-btn flat round dense icon="redeem" class="text-primary">
-					<q-menu id="donations">
-						<div class="row no-wrap q-pa-md">
-							<div class="column">
-								<div class="text-h6 q-mb-md">Donations</div>
-								<p>Working on this app has been quite a journey, and still going on!</p>
-								<p>
-									Tips are always appreciated and if you would like to support my efforts, you can always help me by
-									sending Paw tips at: <span class="paw-address">{{ pawWalletForTips }}</span>
-								</p>
-							</div>
-							<q-separator vertical inset class="q-mx-lg" />
-							<div class="column items-center" v-if="$q.platform.is.desktop">
-								<div class="text-subtitle1 q-mt-md q-mb-xs">Tip me at:</div>
-								<q-icon :name="pawWalletForTipsQRCode" size="200px" />
-							</div>
-							<q-btn v-if="$q.platform.is.mobile" color="primary" text-color="secondary" label="OK" v-close-popup />
-						</div>
-					</q-menu>
-				</q-btn>
 				<q-btn flat round dense icon="settings">
 					<settings-menu />
 				</q-btn>
@@ -100,30 +80,6 @@
 			</q-banner>
 			<router-view />
 		</q-page-container>
-		<q-footer class="bg-footer">
-			<span @click="openGithub(appVersion)">
-				<q-icon name="fab fa-github" size="20px" style="margin-top: -3px" />
-				wPAW v{{ appVersion }}
-			</span>
-			-
-			<span class="social">
-				<a href="https://wrap-that-potassium.gitbook.io/wpaw/introduction/quick-tour" target="_blank">
-					<q-icon name="live_help" color="white" size="24px" style="margin-top: -3px">
-						<q-tooltip>Documentation</q-tooltip>
-					</q-icon>
-				</a>
-				<a href="https://chat.paw.digital" target="_blank">
-					<q-icon name="fab fa-discord" color="white" size="20px" style="margin-top: -3px">
-						<q-tooltip>Discord</q-tooltip>
-					</q-icon>
-				</a>
-				<a href="https://t.me/paw_digital" target="_blank">
-					<q-icon name="fab fa-telegram" color="white" size="20px" style="margin-top: -3px">
-						<q-tooltip>Telegram</q-tooltip>
-					</q-icon>
-				</a>
-			</span>
-		</q-footer>
 	</q-layout>
 </template>
 

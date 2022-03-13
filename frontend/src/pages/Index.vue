@@ -10,7 +10,7 @@
 		</div>
 		<div v-if="!isUserConnected" class="welcome-section q-pa-md row justify-center">
 			<div class="col-lg-5 col-md-6 col-sm-9 col-xs-12 text-center">
-				<div v-if="!$q.platform.is.mobile" class="love row justify-center items-center q-col-gutter-lg">
+				<div v-if="!$q.platform.is.mobile" class="love row justify-center items-center q-col-gutter-lg headerimg">
 					<div class="col text-right">
 						<q-img src="paw-logo-vertical.svg" />
 					</div>
@@ -30,10 +30,12 @@
 					:src="require(`@/assets/wpaw-logo-${expectedBlockchain.network}.svg`)"
 					width="150px"
 				/>
-				<h3>
+				<!--
+				<h3 class="subtitle">
 					wPAW is wrapped <a href="https://paw.digital">Paw</a> on
 					<a :href="expectedBlockchain.chainUrl" target="_blank">{{ expectedBlockchain.chainName }}</a>
 				</h3>
+				-->
 				<q-btn @click="connectWalletProvider" size="xl" color="primary" text-color="secondary" label="connect" />
 				<div v-if="!$q.platform.is.mobile">
 					<h4>What can you do with wPAW?</h4>
@@ -41,10 +43,10 @@
 						<div class="col">
 							<q-card>
 								<q-card-section>
-									<div class="text-h5">Swap with other crypto</div>
+									<div class="text-h5">Wrap your PAW</div>
 								</q-card-section>
 								<q-card-section>
-									<p>Swap from PAW to wPAW to your preferred crypto or vice-versa</p>
+									<p>Wrap your PAW into wPAW and swap with other crypto</p>
 								</q-card-section>
 							</q-card>
 						</div>
@@ -61,10 +63,10 @@
 						<div class="col">
 							<q-card>
 								<q-card-section>
-									<div class="text-h5">Learn DeFi</div>
+									<div class="text-h5">Unwrap your PAW</div>
 								</q-card-section>
 								<q-card-section>
-									<p>Without risking much of your hard earned PAW</p>
+									<p>Use the PAW network with wPAW you have</p>
 								</q-card-section>
 							</q-card>
 						</div>
@@ -140,6 +142,9 @@ body.body--dark
 .love col
 	width: 100%
 
+.headerimg
+	margin-bottom: 50px
+	
 body.body--light
 	.love
 		background-color: lighten($secondary, 15%)
